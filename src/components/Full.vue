@@ -11,8 +11,12 @@
           </el-submenu>
           <el-menu-item v-if="item.leaf&&item.children.length>0" :index="item.children[0].path"><i :class="item.iconCls"></i>{{item.children[0].name}}</el-menu-item>
         </template>
-      </el-menu> 
+      </el-menu>       
     </div>
+    <div class="content">
+      <router-view></router-view>
+    </div>
+    
   </div>
 </template>
 
@@ -62,7 +66,6 @@
         this.sysUserName = user.name || '';
         this.sysUserAvatar = user.avatar || '';
       }
-
     }
   }
 
@@ -71,6 +74,7 @@
 <style lang="scss">
   // @import '~scss_vars';
   .sidebar {
+    float: left;
     width: 200px;
     height: 100%;
     background-color: #333744;
@@ -108,6 +112,10 @@
   }
   .el-menu--collapse {
     width: 64px;
+  }
+  .content{
+    float: left;
+    padding: 20px;
   }
   .breadcrumb-router {
     position: relative;
