@@ -2,8 +2,8 @@
   <div class="app-container">
     <app-header :sysUserName="sysUserName"></app-header>
     <div class='shadows'></div>
-    <div class="sidebar">
-      <el-menu :default-active="$route.path" class="sidebar-menu" unique-opened router :collapse="isCollapse">
+    <div class="ds-sidebar">
+      <el-menu :default-active="$route.path" class="ds-sidebar-menu" unique-opened router :collapse="isCollapse">
         <template v-for="(item,index) in $router.options.routes" v-if="!item.hidden">
           <el-submenu :index="index+''" v-if="!item.leaf">
             <template slot="title"><i :class="item.iconCls"></i><span slot="title">{{item.name}}</span></template>
@@ -13,8 +13,12 @@
         </template>
       </el-menu>       
     </div>
-    <div class="content">
-      <router-view></router-view>
+    <div class="ds-content">
+      <div class="ds-content-bd">
+        <div class="ds-fluid">
+          <router-view></router-view>
+        </div>
+      </div>
     </div>
     
   </div>
@@ -72,15 +76,28 @@
 </script>
 
 <style lang="scss">
+
+
+.ds-fluid {
+  padding: 15px;
+}
+
+.ds-fluid {
+  position: relative;
+  margin: 0 auto;
+}
   // @import '~scss_vars';
-  .sidebar {
-    float: left;
+  .ds-sidebar {
+    position: fixed;
+    left: 0;
+    bottom: 0;
     width: 200px;
-    height: 100%;
+    z-index: 109;
+    top: 60px;
     background-color: #333744;
   }
   //hover 4a5064
-  .sidebar-menu {
+  .ds-sidebar-menu {
     text-align: left;
     height: 100%;
     background-color: #333744;
@@ -113,9 +130,25 @@
   .el-menu--collapse {
     width: 64px;
   }
-  .content{
-    float: left;
-    padding: 20px;
+  .ds-content{
+    position: absolute;
+    left: 200px;
+    top: 60px;
+    bottom: 0;
+    background-color: #000;
+    z-index: 100;
+    right: 0;
+  }
+  .ds-content-bd {
+    width: auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    overflow: hidden;
+    left: 0;
+    overflow-y: auto;
+    background-color: #eaedf1;
   }
   .breadcrumb-router {
     position: relative;

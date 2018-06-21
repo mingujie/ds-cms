@@ -4,6 +4,8 @@ import HelloWorld from '@/components/HelloWorld'
 import Full from '@/components/Full.vue'
 import Home from '@/views/Home'
 import Login from '@/views/Login'
+import SystemBase from '@/views/system/Base'
+import CategoryList from '@/views/category/List'
 
 Vue.use(Router)
 
@@ -45,6 +47,16 @@ export default new Router({
         component: Full
       }]     
     },
+    {
+      path: '/category',
+      name: '分类管理',
+      component: Full,
+      children:[{
+        path: '/category/list',
+        name: '分类列表',
+        component: CategoryList
+      }]     
+    },
 
     {
       path: '/user',
@@ -56,6 +68,17 @@ export default new Router({
         hidden: false,
         component: Home
       }]     
+    },
+    {
+      path: '/system',
+      name: '系统设置',
+      component: Full,
+      children:[{
+        path: '/system/',
+        name: '基础设置',
+        hidden: false,
+        component: SystemBase
+      }]       
     }
   ]
 })
