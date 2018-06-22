@@ -1,12 +1,15 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
 import Full from '@/components/Full.vue'
 import Home from '@/views/Home'
 import Login from '@/views/Login'
 import SystemBase from '@/views/system/Base'
 import CategoryList from '@/views/category/List'
 import UserList from '@/views/user/List'
+
+//课程路由
+import CurriculumCreate from '@/views/curriculum/Create'
+import CurriculumList from '@/views/curriculum/List'
 Vue.use(Router)
 
 export default new Router({
@@ -34,17 +37,17 @@ export default new Router({
     }, 
 
     {
-      path: '/kecheng',
+      path: '/curriculum',
       name: '课程管理',
       component: Full,
       children:[{
-        path: '/kecheng/list',
-        name: '课程列表',
-        component: Full
-      },{
-        path: '/kecheng/create',
+        path: '/curriculum/create',
         name: '新建课程',
-        component: Full
+        component: CurriculumCreate
+      },{
+        path: '/curriculum/list',
+        name: '课程列表',
+        component: CurriculumList
       }]     
     },
     {

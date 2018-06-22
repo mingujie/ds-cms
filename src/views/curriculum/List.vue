@@ -2,7 +2,7 @@
   <div class="ds-moudle">
     <el-row :gutter="20" class="ds-moudle-hd">
       <el-col :span="24">
-        <el-button @click="onAddCategoryHandle">添加分类</el-button> 
+        <el-button @click="onAddUserHandle">添加课程</el-button> 
       </el-col> 
     </el-row>
      <el-table
@@ -161,7 +161,7 @@
         this.dialog.visible = true
         this.dialog.title = "编辑用户"
       },
-      onAddCategoryHandle(){
+      onAddUserHandle(){
         this.dialog.visible = true
         this.dialog.title = "添加用户"
       },
