@@ -86,8 +86,8 @@
           </el-form-item>
         </el-form>      
         <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="onSubmit('ruleForm')">确 定</el-button>
+        <el-button  @click="handleClose">取 消</el-button>
+        <el-button type="primary" @click="onSubmit('ruleForm')" :loading="submitLoading">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -113,6 +113,7 @@
           title: '新增分类',
           visible: false
         },
+        submitLoading: false,
         isEditorStatus: false,
         curEditorRowIndex: 0,
         tableData2: [{
@@ -168,13 +169,21 @@
         this.dialog.title = "添加分类"
       },
       handleClose(done) {
-        this.$confirm('确认关闭？')
+        var _self = this
+        console.log(typeof(done), '这是')
+        _self.$confirm('确认关闭？')
           .then(_ => {
-
-            done();
+            if(typeof(done) === 'function') {
+              done();
+            }else {
+              _self.dialog.visible = false
+            }
+            _self.$refs['ruleForm'].resetFields();
+            
           })
           .catch(_ => {});
-        this.isEditorStatus = false
+
+        _self.isEditorStatus = false
       },
       handleAvatarSuccess(){
 
@@ -211,6 +220,8 @@
           _self.dialog.visible = false 
 
         })
+
+        _self.submitLoading = false
       },
       createCateRow(form){
         var _self = this
@@ -245,6 +256,7 @@
         var _self = this
         _self.$refs[formName].validate((valid) => {
           if (valid) {
+            _self.submitLoading = true
             callback()
           } else {
             console.log('error submit!!');
