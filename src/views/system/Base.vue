@@ -16,13 +16,13 @@
 
           <el-form-item label="站点Logo">
             <el-upload
-              class="avatar-uploader"
+              class="ds-avatar-uploader"
               action="https://jsonplaceholder.typicode.com/posts/"
               :show-file-list="false"
               :on-success="handleAvatarSuccess"
               :before-upload="beforeAvatarUpload">
-              <img v-if="ruleForm.logoUrl" :src="ruleForm.logoUrl" class="avatar">
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+              <img v-if="ruleForm.logoUrl" :src="ruleForm.logoUrl" class="ds-avatar">
+              <i v-else class="el-icon-plus ds-avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
           <el-form-item label="站点版权信息" prop="copyright">
@@ -114,32 +114,6 @@ export default {
   .ds-system-ruleForm {
     background: #fff;
     padding: 20px;
-  }
-  .avatar-uploader {
-    text-align: left;
-  }
-  .avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-  .avatar-uploader .el-upload:hover {
-    border-color: #409EFF;
-  }
-  .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 100px;
-    height: 100px;
-    line-height: 100px;
-    text-align: center;
-  }
-  .avatar {
-    width: 178px;
-    height: 178px;
-    display: block;
   }
 
 </style>

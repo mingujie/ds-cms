@@ -6,7 +6,7 @@ import Home from '@/views/Home'
 import Login from '@/views/Login'
 import SystemBase from '@/views/system/Base'
 import CategoryList from '@/views/category/List'
-
+import UserList from '@/views/user/List'
 Vue.use(Router)
 
 export default new Router({
@@ -66,7 +66,7 @@ export default new Router({
         path: '/user/list',
         name: '用户列表',
         hidden: false,
-        component: Home
+        component: UserList
       }]     
     },
     {

@@ -136,7 +136,6 @@
     top: 60px;
     bottom: 0;
     background-color: #000;
-    z-index: 100;
     right: 0;
   }
   .ds-content-bd {
