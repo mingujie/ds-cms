@@ -94,8 +94,8 @@
           </el-form-item>
         </el-form>      
         <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button @click="dialog.visible = false">取 消</el-button>
+        <el-button type="primary" @click="dialog.visible = false">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -134,6 +134,7 @@
       ruleForm: {
         logoUrl: '',
         title: '',
+        password: '',
         desc: '',
         keywords: '',
         copyright: '',
@@ -141,9 +142,11 @@
       },
       rules: {
         title: [
-          { required: true, message: '请输入站点名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-        ]
+          { required: true, message: '请输入昵称', trigger: 'blur' }
+        ],
+        password: [{
+          required: true, message: '请输入密码', trigger: 'blur'
+        }]
       }
 
       }

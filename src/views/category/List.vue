@@ -2,7 +2,7 @@
   <div class="ds-moudle">
     <el-row :gutter="20" class="ds-moudle-hd">
       <el-col :span="24">
-        <el-button @click="onAddCategoryHandle">添加分类</el-button> 
+        <el-button @click="onAddCategoryHandle">添加一级分类</el-button> 
       </el-col> 
     </el-row>
      <el-table
@@ -12,43 +12,36 @@
       class="ds-table"
       :row-class-name="tableRowClassName">
       <el-table-column
-        prop="uid"
+        prop="cid"
         label="ID"
         width="60">
       </el-table-column>
       <el-table-column
-        prop="name"
-        label="姓名"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        prop="nickname"
-        label="昵称"
+        prop="FCateName"
+        label="分类名称"
         width="180">
       </el-table-column>
       <el-table-column
-        prop="sex"
-        label="性别"
-        width="80">
-      </el-table-column>
-      <el-table-column
-        prop="phone"
-        label="电话"
+        prop="cateThumb"
+        label="缩略图"
         width="120">
       </el-table-column>
       <el-table-column
-        prop="email"
-        label="邮箱">
+        prop="SCateName"
+        label="二级分类"
+        width="160">
       </el-table-column>
       <el-table-column
-        prop="createTime"
-        label="创建时间">
+        prop="TCateName"
+        width="160"
+        label="三级分类">
       </el-table-column>
       <el-table-column
         label="操作">
         <template slot-scope="scope">
           <el-button @click="onEditorHandle(scope.row)" type="text" size="small">编辑</el-button>
           <el-button type="text" size="small" @click="onDeleteRow(scope.$index, tableData2)">删除</el-button>
+          <el-button type="text" size="small">增(改)子分类</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -58,39 +51,26 @@
       width="50%"
       class="ds-dialog"
       :before-close="handleClose">
-        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="70px" style="padding-right: 10px;">
-          <el-form-item label="昵称" prop="title">
-            <el-input v-model="ruleForm.title" placeholder="请输入昵称"></el-input>
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" style="padding-right: 10px;">
+          <el-form-item label="中文名称" prop="name">
+            <el-input v-model="ruleForm.name" placeholder="请输入中文名称"></el-input>
           </el-form-item>
-          <el-form-item label="密码" prop="password">
-            <el-input v-model="ruleForm.password" type="password" placeholder="请输入密码"></el-input>
+          <el-form-item label="英文名称" prop="ename">
+            <el-input placeholder="请输入英文名称" v-model="ruleForm.ename"></el-input>
           </el-form-item>
-
-          <el-form-item label="姓名" prop="desc">
-            <el-input placeholder="请输入真实姓名" v-model="ruleForm.desc"></el-input>
-          </el-form-item>
-          <el-form-item label="性别" prop="desc">
-            <el-input placeholder="请输入真实姓名" v-model="ruleForm.desc"></el-input>
-          </el-form-item>
-          <el-form-item label="电话" prop="desc">
-            <el-input placeholder="请输入你的手机号码" v-model="ruleForm.desc"></el-input>
-          </el-form-item>
-          <el-form-item label="邮箱" prop="desc">
-            <el-input placeholder="请输入你邮箱" v-model="ruleForm.desc"></el-input>
-          </el-form-item>
-          <el-form-item label="头像">
+          <el-form-item label="缩略图">
             <el-upload
               class="ds-avatar-uploader"
               action="https://jsonplaceholder.typicode.com/posts/"
               :show-file-list="false"
               :on-success="handleAvatarSuccess"
               :before-upload="beforeAvatarUpload">
-              <img v-if="ruleForm.logoUrl" :src="ruleForm.logoUrl" class="ds-avatar">
+              <img v-if="ruleForm.thumb" :src="ruleForm.thumb" class="ds-avatar">
               <i v-else class="el-icon-plus ds-avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
-          <el-form-item label="个人简介" prop="copyright">
-            <el-input type="textarea" :rows="3" placeholder="请输入个人简介" v-model="ruleForm.copyright"></el-input>
+          <el-form-item label="描述" prop="copyright">
+            <el-input type="textarea" :rows="3" placeholder="请输入分类描述" v-model="ruleForm.desc"></el-input>
           </el-form-item>
         </el-form>      
         <span slot="footer" class="dialog-footer">
@@ -117,33 +97,30 @@
     data() {
       return {
         dialog: {
-          title: '添加用户',
+          title: '新增分类',
           visible: false
         },
         tableData2: [{
-          uid: 1,
-          createTime: '2016-05-02',
-          name: '王小虎',
-          nickname: '一直大花豹',
-          sex: '男',
-          phone: 1773321313,
-          email: 'dad@163.com',
-
-          address: '上海市普陀区金沙江路 1518 弄',
+          cid: 122,
+          FCateName: '一级类目名称',
+          SCateName: '二级类目名称',
+          TCateName: '三级类目名称',
+          cateThumb: '缩略图'
         }],
       ruleForm: {
-        logoUrl: '',
-        title: '',
+        ename: '',
+        name: '',
         desc: '',
-        keywords: '',
-        copyright: '',
-        countCode: ''
+        thumb: ''
       },
       rules: {
-        title: [
-          { required: true, message: '请输入站点名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        name: [
+          { required: true, message: '请输入中文名称', trigger: 'blur' }
+        ],
+        ename: [
+          { required: true, message: '请输入英文名称', trigger: 'blur' }
         ]
+
       }
 
       }
@@ -185,7 +162,7 @@
         });
       },
       confirm(options, callback) {
-        this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+        this.$confirm('此操作将永久删除该分类及其子分类，你确定删除吗？', '警告', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
