@@ -1,5 +1,5 @@
 <template>
-  <div class="ds-system">
+  <div class="ds-moudle">
     
     <el-row :gutter="20">
       <el-col :span="24">

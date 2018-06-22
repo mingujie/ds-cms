@@ -5,6 +5,8 @@ import Home from '@/views/Home'
 import Login from '@/views/Login'
 import SystemBase from '@/views/system/Base'
 import CategoryList from '@/views/category/List'
+import SecondCategoryList from '@/views/category/SecondList'
+import ThirdCategoryList from '@/views/category/ThirdList'
 import UserList from '@/views/user/List'
 
 //课程路由
@@ -58,6 +60,18 @@ export default new Router({
         path: '/category/list',
         name: '分类列表',
         component: CategoryList
+      },{
+        path: '/category/second_list/:cid',
+        name: 'secondList',
+        cname: '二级分类列表',
+        component: SecondCategoryList,
+        hidden: true
+      },{
+        path: '/category/third_list/:cid',
+        name: 'thirdList',
+        cname: '三级分类列表',
+        component: ThirdCategoryList,
+        hidden: true
       }]     
     },
 

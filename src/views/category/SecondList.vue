@@ -18,12 +18,7 @@
       </el-table-column>
       <el-table-column
         prop="cateName"
-        label="分类名称（中文）"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="ename"
-        label="分类名称（英文）"
+        label="分类名称"
         width="180">
       </el-table-column>
       <el-table-column
@@ -32,31 +27,24 @@
         width="120">
       </el-table-column>
       <el-table-column
-        prop="scateCount"
-        label="二级分类(个)"
+        prop="SCateName"
+        label="二级分类"
         width="160">
       </el-table-column>
       <el-table-column
-        prop="tcateCount"
+        prop="TCateName"
         width="160"
-        label="三级分类（个）">
+        label="三级分类">
       </el-table-column>
       <el-table-column
         label="操作">
         <template slot-scope="scope">
-          <el-button @click="onEditorHandle(scope.$index, scope.row)" type="text" size="small">编辑</el-button>
+          <el-button @click="onEditorHandle(scope.row)" type="text" size="small">编辑</el-button>
           <el-button type="text" size="small" @click="onDeleteRow(scope.$index, tableData2)">删除</el-button>
           <el-button type="text" size="small" @click="onChangeCategory(scope.row.cid)">增(改)子分类</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <div class="ds-pagination">
-      <el-pagination
-        background
-        layout="prev, pager, next"
-        :total="100">
-      </el-pagination>
-    </div>
     <el-dialog
       :title="dialog.title"
       :visible.sync="dialog.visible"
@@ -108,21 +96,17 @@
 
     data() {
       return {
-        cateBtnName: '新增一级分类',
+        cateBtnName: '新增二级分类',
         dialog: {
           title: '新增分类',
           visible: false
         },
-        isEditorStatus: false,
-        curEditorRowIndex: 0,
         tableData2: [{
           cid: 122,
           cateName: '一级类目名称',
-          scateCount: 8,
-          tcateCount: 101,
-          cateThumb: '缩略图',
-          desc: '这是一个描述',
-          ename: 'heelo'
+          SCateName: '二级类目名称',
+          TCateName: '三级类目名称',
+          cateThumb: '缩略图'
         }],
       ruleForm: {
         ename: '',
@@ -151,17 +135,18 @@
         }
         return '';
       },
-      onEditorHandle(index, row){
-        console.log('这是第几个', index)
-        var ruleForm = this.ruleForm
-        ruleForm.ename = row.ename
-        ruleForm.name = row.cateName
-        ruleForm.desc = row.cateDesc,
-        ruleForm.thumb =  row.cateThumb
+      onEditorHandle(row){
+        console.log(row)
+
+        this.ruleForm =  {
+          ename: row.ename,
+          name: row.name,
+          desc: row.desc,
+          thumb: row.thumb
+        }
         this.dialog.title = "编辑分类"
         this.dialog.visible = true
-        this.curEditorRowIndex = index
-        this.isEditorStatus = true
+        
       },
       onAddCategoryHandle(){
         this.dialog.visible = true
@@ -170,11 +155,9 @@
       handleClose(done) {
         this.$confirm('确认关闭？')
           .then(_ => {
-
             done();
           })
           .catch(_ => {});
-        this.isEditorStatus = false
       },
       handleAvatarSuccess(){
 
@@ -189,57 +172,28 @@
         });
       },
       onChangeCategory(cid){
-        console.log(cid)
-        this.$router.push({name: 'secondList', params: { cid: cid } })
+        this.$router.push({name: 'thirdList', params: { cid: cid } })
+
       },
       onSubmit(formName){
         var _self = this
         _self.onRuleForm(formName, function(){
           console.log(formName)
-          // var newData = _self.formartData(_self.ruleForm)
-          if(_self.isEditorStatus) {
-            // console.log(newData,_self.curEditorRowIndex, _self.ruleForm)
-            _self.formartData(_self.curEditorRowIndex, _self.ruleForm)
-            // _self.$set(_self.tableData2, _self.curEditorRowIndex, _self.ruleForm)
-          }else {
-            //_self.tableData2.push(newData)
-            var cateRow = _self.createCateRow(_self.ruleForm)
-
-            _self.tableData2.push(cateRow)
-          }
-
-          _self.dialog.visible = false 
-
+          var newData = _self.formartData(_self.ruleForm)
+          _self.tableData2.push(newData)
+          _self.$refs[formName].resetFields();
+          _self.dialog.visible = false
         })
       },
-      createCateRow(form){
-        var _self = this
-        var obj = {
-          cid: '',
-          cateName: form.name || '',
-          scateCount: '',
-          tcateCount: '',
-          cateThumb: form.thumb || '',
-          desc: form.desc || '',
-          ename: form.ename || ''
+      formartData(form){
+        var newObj = {
+          cid: 1333,
+          cateName: form.name,
+          SCateName: '',
+          TCateName: '',
+          cateThumb: form.thumb
         }
-
-        return obj
-      },
-      formartData(index, form){
-        console.log(form)
-        this.$set(this.tableData2[index], 'cateName', form.name)
-        this.$set(this.tableData2[index], 'cateThumb', form.thumb)
-        this.$set(this.tableData2[index], 'ename', form.ename)
-        //this.tableData2[index]['name'] = form.name
-        // var newObj = {
-        //   cid: form.,
-        //   name: form.name,
-        //   ename: form.ename,
-        //   thumb: form.thumb,
-        //   desc: form.desc
-        // }
-        //return newObj
+        return newObj
       },  
       onRuleForm(formName, callback){
         var _self = this
@@ -277,4 +231,20 @@
 </script>
 
 <style>
+  .ds-table th {
+    text-align: center;
+  }
+  .ds-moudle {
+
+  }
+  .ds-moudle-hd {
+    text-align: left;
+    margin-bottom: 15px;
+  }
+  .ds-dialog {
+
+  }
+  .ds-dialog .el-dialog__header {
+    text-align: left;
+  }
 </style>

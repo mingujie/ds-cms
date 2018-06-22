@@ -24,3 +24,41 @@
     height: 178px;
     display: block;
   }
+
+  .ds-pagination {
+    text-align: left;
+    margin-top: 15px;
+  }
+  // .ds-pagination .el-pagination {
+  //   padding: 0;
+  // }
+
+  .ds-moudle {
+    padding: 20px;
+    height: auto;
+    background-color: #FFF;
+  }
+  .ds-fluid {
+    padding: 15px;
+  }
+
+  .ds-fluid {
+    position: relative;
+    margin: 0 auto;
+    height: auto;
+  }
+
+  .ds-table th {
+    text-align: center;
+  }
+
+  .ds-moudle-hd {
+    text-align: left;
+    margin-bottom: 15px;
+  }
+  .ds-dialog {
+
+  }
+  .ds-dialog .el-dialog__header {
+    text-align: left;
+  }
