@@ -17,7 +17,7 @@
         width="60">
       </el-table-column>
       <el-table-column
-        prop="FCateName"
+        prop="cateName"
         label="分类名称"
         width="180">
       </el-table-column>
@@ -75,7 +75,7 @@
         </el-form>      
         <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="onSubmit('ruleForm')">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -102,7 +102,7 @@
         },
         tableData2: [{
           cid: 122,
-          FCateName: '一级类目名称',
+          cateName: '一级类目名称',
           SCateName: '二级类目名称',
           TCateName: '三级类目名称',
           cateThumb: '缩略图'
@@ -136,11 +136,11 @@
       },
       onEditorHandle(){
         this.dialog.visible = true
-        this.dialog.title = "编辑用户"
+        this.dialog.title = "编辑分类"
       },
       onAddCategoryHandle(){
         this.dialog.visible = true
-        this.dialog.title = "添加用户"
+        this.dialog.title = "添加分类"
       },
       handleClose(done) {
         this.$confirm('确认关闭？')
@@ -160,6 +160,38 @@
         this.confirm({}, function(){
           rows.splice(index, 1);
         });
+      },
+      onSubmit(formName){
+        var _self = this
+        _self.onRuleForm(formName, function(){
+          console.log(formName)
+          var newData = _self.formartData(_self.ruleForm)
+          _self.tableData2.push(newData)
+          _self.$refs[formName].resetFields();
+          _self.dialog.visible = false
+        })
+      },
+      formartData(form){
+        var newObj = {
+          cid: 1333,
+          cateName: form.name,
+          SCateName: '',
+          TCateName: '',
+          cateThumb: form.thumb
+        }
+        return newObj
+      },  
+      onRuleForm(formName, callback){
+        var _self = this
+        _self.$refs[formName].validate((valid) => {
+          if (valid) {
+            callback()
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+
       },
       confirm(options, callback) {
         this.$confirm('此操作将永久删除该分类及其子分类，你确定删除吗？', '警告', {
