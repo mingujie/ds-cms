@@ -17,32 +17,32 @@
         width="60">
       </el-table-column>
       <el-table-column
-        prop="name"
-        label="姓名"
+        prop="title"
+        label="标题"
         width="120">
       </el-table-column>
       <el-table-column
-        prop="nickname"
-        label="昵称"
+        prop="category"
+        label="分类"
         width="180">
       </el-table-column>
       <el-table-column
-        prop="sex"
-        label="性别"
+        prop="level"
+        label="等级"
         width="80">
       </el-table-column>
       <el-table-column
-        prop="phone"
-        label="电话"
+        prop="instructor"
+        label="讲师"
         width="120">
       </el-table-column>
       <el-table-column
-        prop="email"
-        label="邮箱">
+        prop="price"
+        label="价格">
       </el-table-column>
       <el-table-column
-        prop="createTime"
-        label="创建时间">
+        prop="publicTime"
+        label="发布时间">
       </el-table-column>
       <el-table-column
         label="操作">
@@ -122,12 +122,12 @@
         },
         tableData2: [{
           uid: 1,
-          createTime: '2016-05-02',
-          name: '王小虎',
-          nickname: '一直大花豹',
-          sex: '男',
-          phone: 1773321313,
-          email: 'dad@163.com',
+          publicTime: '2016-05-02',
+          title: '王小虎',
+          category: '一直大花豹',
+          level: '初级',
+          instructor: '刀疤',
+          price: 9.98,
 
           address: '上海市普陀区金沙江路 1518 弄',
         }],
@@ -158,12 +158,14 @@
         return '';
       },
       onEditorHandle(){
-        this.dialog.visible = true
-        this.dialog.title = "编辑用户"
+        this.$router.push({path: '/curriculum/create'})
+        // this.dialog.visible = true
+        // this.dialog.title = "编辑用户"
       },
       onAddUserHandle(){
-        this.dialog.visible = true
-        this.dialog.title = "添加用户"
+        this.$router.push({path: '/curriculum/create'})
+        // this.dialog.visible = true
+        // this.dialog.title = "添加用户"
       },
       handleClose(done) {
         this.$confirm('确认关闭？')
