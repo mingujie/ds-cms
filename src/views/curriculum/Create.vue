@@ -1,84 +1,20 @@
 <template>
   <div class="ds-moudle">
-    <el-row :gutter="20" class="ds-moudle-hd">
+    
+    <el-row :gutter="20">
       <el-col :span="24">
-        <el-button @click="onAddUserHandle">添加用户</el-button> 
-      </el-col> 
-    </el-row>
-     <el-table
-      :data="tableData2"
-      width="50%"
-      border
-      class="ds-table"
-      :row-class-name="tableRowClassName">
-      <el-table-column
-        prop="uid"
-        label="ID"
-        width="60">
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="姓名"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        prop="nickname"
-        label="昵称"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="sex"
-        label="性别"
-        width="80">
-      </el-table-column>
-      <el-table-column
-        prop="phone"
-        label="电话"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        prop="email"
-        label="邮箱">
-      </el-table-column>
-      <el-table-column
-        prop="createTime"
-        label="创建时间">
-      </el-table-column>
-      <el-table-column
-        label="操作">
-        <template slot-scope="scope">
-          <el-button @click="onEditorHandle(scope.row)" type="text" size="small">编辑</el-button>
-          <el-button type="text" size="small" @click="onDeleteRow(scope.$index, tableData2)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-dialog
-      :title="dialog.title"
-      :visible.sync="dialog.visible"
-      width="50%"
-      class="ds-dialog"
-      :before-close="handleClose">
-        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="70px" style="padding-right: 10px;">
-          <el-form-item label="昵称" prop="title">
-            <el-input v-model="ruleForm.title" placeholder="请输入昵称"></el-input>
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="140px" class="ds-system-ruleForm">
+          <el-form-item label="课程标题" prop="title">
+            <el-input v-model="ruleForm.title" placeholder="请输入课程标题"></el-input>
           </el-form-item>
-          <el-form-item label="密码" prop="password">
-            <el-input v-model="ruleForm.password" type="password" placeholder="请输入密码"></el-input>
+          <el-form-item label="课程简介" prop="desc">
+            <el-input type="textarea" placeholder="请输入课程简介" :rows="3" v-model="ruleForm.desc"></el-input>
+          </el-form-item>
+          <el-form-item label="课程关键词" prop="keywords">
+            <el-input v-model="ruleForm.keywords" placeholder="请输入课程关键词"></el-input>
           </el-form-item>
 
-          <el-form-item label="姓名" prop="desc">
-            <el-input placeholder="请输入真实姓名" v-model="ruleForm.desc"></el-input>
-          </el-form-item>
-          <el-form-item label="性别" prop="desc">
-            <el-input placeholder="请输入真实姓名" v-model="ruleForm.desc"></el-input>
-          </el-form-item>
-          <el-form-item label="电话" prop="desc">
-            <el-input placeholder="请输入你的手机号码" v-model="ruleForm.desc"></el-input>
-          </el-form-item>
-          <el-form-item label="邮箱" prop="desc">
-            <el-input placeholder="请输入你邮箱" v-model="ruleForm.desc"></el-input>
-          </el-form-item>
-          <el-form-item label="头像">
+          <el-form-item label="课程封面">
             <el-upload
               class="ds-avatar-uploader"
               action="https://jsonplaceholder.typicode.com/posts/"
@@ -89,52 +25,93 @@
               <i v-else class="el-icon-plus ds-avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
-          <el-form-item label="个人简介" prop="copyright">
-            <el-input type="textarea" :rows="3" placeholder="请输入个人简介" v-model="ruleForm.copyright"></el-input>
+          <el-form-item label="课程分类" prop="title">
+              <el-cascader
+                placeholder="试试搜索：指南"
+                :options="cascaderOptions"
+                style="width: 300px;"
+                filterable
+              ></el-cascader>
           </el-form-item>
-        </el-form>      
-        <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
+          <el-form-item label="课程讲师" prop="title">
+            <el-input v-model="ruleForm.title" placeholder="请输入课程标题"></el-input>
+          </el-form-item>
+          <el-form-item label="课程等级" prop="level">
+            <el-select v-model="ruleForm.level" placeholder="请选择">
+              <el-option
+                v-for="item in curriculum.level"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+
+          </el-form-item>
+          <el-form-item label="标签" prop="tags">
+            <el-input v-model="ruleForm.tags" placeholder="请输入课程标题"></el-input>
+          </el-form-item>
+          <el-form-item label="课程详情" prop="title">
+            <el-input v-model="ruleForm.title" placeholder="请输入课程标题"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <div class="ds-operational">
+              <el-button @click="submitForm('ruleForm')">保存设置</el-button>
+            </div>
+           <!--  <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+          </el-form-item>
+        </el-form>
+      </el-col>
+    </el-row>
   </div>
+  
 </template>
 
-<style>
-  .el-table .warning-row {
-    background: oldlace;
-  }
-
-  .el-table .success-row {
-    background: #f0f9eb;
-  }
-</style>
-
 <script>
-  export default {
 
-    data() {
-      return {
-        dialog: {
-          title: '添加用户',
-          visible: false
-        },
-        tableData2: [{
-          uid: 1,
-          createTime: '2016-05-02',
-          name: '王小虎',
-          nickname: '一直大花豹',
-          sex: '男',
-          phone: 1773321313,
-          email: 'dad@163.com',
 
-          address: '上海市普陀区金沙江路 1518 弄',
-        }],
+
+export default {
+  data() {
+    return {
+      curriculum: {
+        level: [{
+          value: 1,
+          label: '初级'
+        },{
+          value: 2,
+          label: '中级'
+        },{
+          value: 3,
+          label: '高级'
+        }]
+      },
+      cascaderOptions: [{
+        value: 'zhinan',
+        label: '指南',
+        children: [{
+          value: 'shejiyuanze',
+          label: '设计原则',
+          children: [{
+            value: 'yizhi',
+            label: '一致'
+          }, {
+            value: 'fankui',
+            label: '反馈'
+          }, {
+            value: 'xiaolv',
+            label: '效率'
+          }, {
+            value: 'kekong',
+            label: '可控'
+          }]
+        }]
+      }],
       ruleForm: {
         logoUrl: '',
+        tags: '',
         title: '',
         desc: '',
+        level: '',
         keywords: '',
         copyright: '',
         countCode: ''
@@ -145,83 +122,55 @@
           { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
         ]
       }
-
-      }
-    },
-    methods: {
-      tableRowClassName({row, rowIndex}) {
-        if (rowIndex === 1) {
-          return 'warning-row';
-        } else if (rowIndex === 3) {
-          return 'success-row';
-        }
-        return '';
-      },
-      onEditorHandle(){
-        this.dialog.visible = true
-        this.dialog.title = "编辑用户"
-      },
-      onAddUserHandle(){
-        this.dialog.visible = true
-        this.dialog.title = "添加用户"
-      },
-      handleClose(done) {
-        this.$confirm('确认关闭？')
-          .then(_ => {
-            done();
-          })
-          .catch(_ => {});
-      },
-      handleAvatarSuccess(){
-
-      },
-      beforeAvatarUpload(){
-
-      },
-      onDeleteRow(index, rows) {
-        // var _self = this
-        this.confirm({}, function(){
-          rows.splice(index, 1);
-        });
-      },
-      confirm(options, callback) {
-        this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          callback()
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          });
-        }).catch(() => {
-          // this.$message({
-          //   type: 'info',
-          //   message: '已取消删除'
-          // });          
-        });
-      }
     }
+  },
 
+  mounted() {  
+
+  },
+  computed: {
+  },
+
+  methods: {
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          alert('submit!');
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
+    },
+      handleAvatarSuccess(res, file) {
+        this.imageUrl = URL.createObjectURL(file.raw);
+      },
+      beforeAvatarUpload(file) {
+        const isJPG = file.type === 'image/jpeg';
+        const isLt2M = file.size / 1024 / 1024 < 2;
+
+        if (!isJPG) {
+          this.$message.error('上传头像图片只能是 JPG 格式!');
+        }
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 2MB!');
+        }
+        return isJPG && isLt2M;
+      }
   }
+}
+
 </script>
-
 <style>
-  .ds-table th {
-    text-align: center;
-  }
-  .ds-moudle {
-
-  }
-  .ds-moudle-hd {
-    text-align: left;
-    margin-bottom: 15px;
-  }
-  .ds-dialog {
-
-  }
-  .ds-dialog .el-dialog__header {
+  .ds-operational {
     text-align: left;
   }
+  .ds-system-ruleForm {
+    background: #fff;
+    padding: 20px;
+  }
+
 </style>
