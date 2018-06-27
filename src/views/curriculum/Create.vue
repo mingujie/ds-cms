@@ -25,7 +25,7 @@
               <i v-else class="el-icon-plus ds-avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
-          <el-form-item label="课程分类" prop="title">
+          <el-form-item label="课程分类" prop="category">
               <el-cascader
                 placeholder="试试搜索：指南"
                 :options="cascaderOptions"
@@ -33,8 +33,8 @@
                 filterable
               ></el-cascader>
           </el-form-item>
-          <el-form-item label="课程讲师" prop="title">
-            <el-input v-model="ruleForm.title" placeholder="请输入课程标题"></el-input>
+          <el-form-item label="课程讲师" prop="instructor">
+            <el-input v-model="ruleForm.instructor" placeholder="请输入课程标题"></el-input>
           </el-form-item>
           <el-form-item label="课程等级" prop="level">
             <el-select v-model="ruleForm.level" placeholder="请选择">
@@ -50,8 +50,8 @@
           <el-form-item label="标签" prop="tags">
             <el-input v-model="ruleForm.tags" placeholder="请输入课程标题"></el-input>
           </el-form-item>
-          <el-form-item label="课程详情" prop="title">
-            <el-input v-model="ruleForm.title" placeholder="请输入课程标题"></el-input>
+          <el-form-item label="课程详情" prop="detail">
+            <vue-summernote ref="editer"></vue-summernote>
           </el-form-item>
           <el-form-item>
             <div class="ds-operational">
@@ -107,20 +107,26 @@ export default {
         }]
       }],
       ruleForm: {
-        logoUrl: '',
+        cover: '',
         tags: '',
         title: '',
         desc: '',
         level: '',
         keywords: '',
+        instructor: '',
         copyright: '',
         countCode: ''
       },
       rules: {
         title: [
-          { required: true, message: '请输入站点名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-        ]
+          { required: true, message: '请输入课程标题', trigger: 'blur' }
+        ],
+        desc: [{
+          required: true, message: '请输入课程简介', trigger: 'blur'
+        }],
+        cover: [{
+          required: true, message: '请输入课程简介', trigger: 'blur'
+        }],
       }
     }
   },
