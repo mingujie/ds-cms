@@ -58,6 +58,7 @@ export default new Router({
       },{
         path: '/class/detail',
         name: '课程详情',
+        hidden: true,
         component: ClassDetail
       }]
     },
