@@ -1,6 +1,6 @@
 <template>
   <div class="login-page">
-    <p>系统登录</p>
+    <p>蛋耍网系统登录</p>
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="rule-form">
         <el-form-item prop="name">
             <el-input v-model="ruleForm.name" placeholder="请输入账号"></el-input>
@@ -9,19 +9,23 @@
             <el-input v-model="ruleForm.passward" placeholder="请输入密码"></el-input>
         </el-form-item>
         <el-form-item>
-            <div class="btn">立即登录</div> 
+            <el-button type="primary" class="ds-btn ds-btn-login" :loading="login.loading" @click="submit('ruleForm')">立即登录</el-button>
         </el-form-item>
     </el-form>
-    <ul class="ta-bubbles">
+<!--     <ul class="ta-bubbles">
         <li v-for="(i, j) in Array(10)" :key="i"></li>
     </ul>
-  </div>
+ -->  </div>
 </template>
 
 <script>
+import { getUserLoginInfo } from '@/api/'
 export default {
   data() {
     return {
+        login: {
+            loading: false
+        },
         ruleForm:{
             name: '',
             passward: ''
@@ -44,8 +48,30 @@ export default {
   },
 
   methods: {
-      submit() {
-          
+      submit(formName) {
+        var _self = this
+        _self.validateForm(formName, function(){
+            alert('submit');
+            _self.validateUserInfo()
+        })
+      },
+      validateForm(formName, callback){
+        this.$refs[formName].validate((valid) => {
+          if (valid){ 
+            callback()
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });        
+      },
+      validateUserInfo(){
+        getUserLoginInfo({
+            username: 'danshua',
+            password: 'p@ssword'
+        }).then(function(a, b){
+            console.log(a,b)
+        })
       }
   }
 }
