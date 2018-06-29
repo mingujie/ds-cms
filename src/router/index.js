@@ -5,6 +5,10 @@ import Full from '@/components/Full.vue'
 import Home from '@/views/Home'
 import Login from '@/views/Login'
 
+//课程
+import ClassList from '@/views/class/ClassList'
+import ClassDetail from '@/views/class/ClassDetail'
+
 Vue.use(Router)
 
 export default new Router({
@@ -32,17 +36,17 @@ export default new Router({
     }, 
 
     {
-      path: '/kecheng',
+      path: '/class',
       name: '课程管理',
       component: Full,
       children:[{
-        path: '/kecheng/list',
+        path: '/class/list',
         name: '课程列表',
-        component: Full
+        component: ClassList
       },{
-        path: '/kecheng/create',
-        name: '新建课程',
-        component: Full
+        path: '/class/detail',
+        name: '课程详情',
+        component: ClassDetail
       }]     
     },
 

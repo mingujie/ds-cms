@@ -92,6 +92,10 @@
       background-color: #4a5064;
     }
   }
+  .content{
+    box-sizing: border-box;
+    width: calc(100% - 200px)
+  }
   .pro-sidebar{
     overflow-x: hidden;
     overflow-y: auto;
