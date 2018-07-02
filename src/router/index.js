@@ -12,6 +12,7 @@ import UserList from '@/views/user/List'
 //课程
 import ClassList from '@/views/class/ClassList'
 import ClassDetail from '@/views/class/ClassDetail'
+import ClassManager from '@/views/class/ClassManager'
 
 //课程路由
 import CurriculumCreate from '@/views/curriculum/Create'
@@ -59,6 +60,10 @@ export default new Router({
         path: '/class/detail',
         name: '课程详情',
         component: ClassDetail
+      },{
+        path: '/class/manager',
+        name: '课程审核',
+        component: ClassManager        
       }]
     },
     // {
