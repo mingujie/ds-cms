@@ -1,8 +1,8 @@
 <template>
     <div class="class-upload-page">
         <el-row>
-            <el-button type="primary">添加章</el-button>
-            <el-button type="primary">添加课件</el-button>
+            <el-button type="primary" @click="addSection()">添加章</el-button>
+            <el-button type="primary" @click="addClass()">添加课件</el-button>
         </el-row>
 
         <div class="block">
@@ -15,12 +15,52 @@
             <span class="custom-tree-node" slot-scope="{ node, data }">
                 <span>{{ node.label }}</span>
                 <span>
+                <el-button type="text">添加课件</el-button>
                 <el-button type="text">编辑 </el-button>
                 <el-button type="text">删除</el-button>
                 </span>
             </span>
             </el-tree>
         </div>
+
+        <!-- 添加章，编辑章 -->
+        <el-dialog title="添加章" :visible.sync="dialog">
+            <el-form>
+                <el-form-item label="标题" :label-width="formLabelWidth">
+                    <el-input v-model="sectionName" auto-complete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="dialog = false">确 定</el-button>
+                <el-button @click="dialog = false">取 消</el-button>
+            </div>
+        </el-dialog>
+
+        <!-- 添加课件 -->
+        <el-dialog title="添加课件" :visible.sync="dialogUpload" width="700px">
+            <div class="add-content">
+                <div class="head">
+                    <div class="head-child">
+                        <p>1</p>
+                        <div>选择课件类型</div>
+                    </div>
+                    <div class="head-child">
+                        <p>2</p>
+                        <div>设置课件内容</div>
+                    </div>
+                </div>
+                <div class="middle" v-if="!next">
+                    <img src="../../../assets/movie.png" alt="">
+                    <p>视频</p>
+                </div>
+                <div class="middle-form" v-if="next">
+                  
+                </div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="next = true">下一步</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -29,6 +69,11 @@ export default {
   data() {
     return {
 		input:'',
+        dialog:false,
+        dialogUpload: false,
+        sectionName: '',
+        next:false,
+        formLabelWidth: '120px',
         data: [{
             id: 1,
             label: '一级 1',
@@ -78,7 +123,13 @@ export default {
   methods: {
 		submit() {
 			
-		}
+		},
+        addSection() {
+            this.dialog = true
+        },
+        addClass() {
+            this.dialogUpload = true
+        }
   }
 }
 </script>
@@ -102,9 +153,53 @@ export default {
                 justify-content: space-between;
                 padding-right: 10px;
             }
-            // .el-tree-node__content:nth-of-type(1) {
-            //     border: none;
-            // }
+        }
+
+        .add-content{
+            .head{
+                display: flex;
+                align-items: center;
+                .head-child{
+                    display: flex;
+                    align-items: center;
+                    width: 45%;
+                    justify-content: center;
+                    p{
+                        width: 40px;
+                        height: 40px;
+                        text-align: center;
+                        line-height: 42px;
+                        background: #409EFF;
+                        color: #fff;
+                        font-size: 28px;
+                        border-radius: 50%;
+                    }
+                    div{
+                        margin-left: 20px;
+                        font-size: 16px;
+                    }
+                }
+            }
+            .middle{
+                position: relative;
+                background: #ddd;
+                width: 140px;
+                height: 140px;
+                margin-left: 75px;
+                margin-top: 20px;
+                text-align: center;
+                img{
+                    width: 40px;
+                    height: 40px;
+                    margin-top: 40px;
+                }
+                span{
+                    position: relative;
+                }
+            }
+            .middle-form{
+
+            }
         }
     }
 
