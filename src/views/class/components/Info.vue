@@ -1,8 +1,8 @@
 <template>
     <div class="class-detail-info">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="课程标题" prop="name">
-                <el-input v-model="ruleForm.name" class="w50"></el-input>
+            <el-form-item label="课程标题" prop="title">
+                <el-input v-model="ruleForm.title" class="w50"></el-input>
             </el-form-item>
             <el-form-item label="课程简介" prop="desc">
                 <el-input type="textarea" v-model="ruleForm.desc" class="w50"></el-input>
@@ -33,11 +33,11 @@
                     <el-option label="区域二" value="beijing"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="课程讲师" prop="name">
-                <el-input v-model="ruleForm.name" class="w50"></el-input>
+            <el-form-item label="课程讲师" prop="teacher">
+                <el-input v-model="ruleForm.teacher" class="w50"></el-input>
             </el-form-item>
-            <el-form-item label="课程等级" prop="name">
-                <el-select v-model="ruleForm.region" placeholder="选择等级">
+            <el-form-item label="课程等级" prop="level">
+                <el-select v-model="ruleForm.level" placeholder="选择等级">
                     <el-option label="区域一" value="shanghai"></el-option>
                     <el-option label="区域二" value="beijing"></el-option>
                 </el-select>
@@ -52,8 +52,8 @@
                     <el-input v-model="ruleForm.name" class="w50" placeholder="课程价格"></el-input>
                 </div>
             </el-form-item>
-            <el-form-item label="标签" prop="name">
-                <el-select v-model="value5" multiple placeholder="请选择">
+            <el-form-item label="标签" prop="tags">
+                <el-select v-model="ruleForm.tags" multiple placeholder="请选择">
                     <el-option
                     v-for="item in options"
                     :key="item.value"
@@ -63,7 +63,7 @@
                 </el-select>
             </el-form-item>
 
-            <el-form-item label="课程详情" prop="name">
+            <el-form-item label="课程详情" prop="detail">
                 <div ref="editor" style="text-align:left"></div>
                 <!-- <button @click="getContent">查看内容</button> -->
             </el-form-item>

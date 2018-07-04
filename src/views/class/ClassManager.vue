@@ -65,8 +65,8 @@ export default {
 		currentPage4: 1,
         tableData: [{
         	id: 111122,
-        	title: '锐雯光速QA',
-        	cate: '英雄联盟/锐雯',
+        	title: '你好啊',
+        	cate: 'biubiu',
             publicTime: '2016-05-02',
             price: 9.90,
             level: '初级',

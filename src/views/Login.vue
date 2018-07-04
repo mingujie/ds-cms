@@ -66,10 +66,15 @@ export default {
         });        
       },
       validateUserInfo(){
+        var _self = this
         getUserLoginInfo({
             username: 'danshua',
             password: 'p@ssword'
-        }).then(function(a, b){
+        }).then(function(res, b){
+
+            if(res.code === 0) {
+                _self.$router.push({path: '/home'})
+            }
             console.log(a,b)
         })
       }
