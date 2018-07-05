@@ -13,11 +13,31 @@ console.log('请求了')
 };
 
 export const createCourseCategory = params => { 
-  return axios.post('api/course/category', params).then(res => res.data)
+  return axios.post('/api/course/category', params).then(res => res.data)
 };
 
 
 //课程创建
 export const createCourseSubject = params => { 
-  return axios.post('api/course/subject', params).then(res => res.data)
+  return axios.post('/api/course/subject', params).then(res => res.data)
+};
+
+
+//课程分类
+
+/**
+ * getCourseSectionPage 获取课程列表
+ * @param  {pageNum} params [description]
+ * @return {[type]}        [description]
+ */
+export const getCourseSectionPage = params => { 
+  return axios.get(`/api/course/category/page`, { params: params });
+};
+/**
+ * addCourseSection 新增课程分类
+ * @param  {[type]} params [description]
+ * @return {[type]}        [description]
+ */
+export const addCourseSection = params => { 
+  return axios.post(`/api/course/category`, params).then(res => res.data)
 };

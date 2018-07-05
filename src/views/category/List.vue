@@ -104,6 +104,7 @@
 </style>
 
 <script>
+  import { getCourseSectionPage, addCourseSection } from '@/api/'
   export default {
 
     data() {
@@ -143,6 +144,9 @@
 
       }
     },
+    created(){
+      this.renderCourseSectionPage()
+    },
     methods: {
       tableRowClassName({row, rowIndex}) {
         if (rowIndex === 1) {
@@ -151,6 +155,19 @@
           return 'success-row';
         }
         return '';
+      },
+      renderCourseSectionPage(){
+        getCourseSectionPage({
+            pageNum: 1,
+            pageSize: 10
+        }).then(function(res, b){
+
+            if(res.code === 0) {
+                
+            }
+            console.log(a,b)
+        })
+
       },
       onEditorHandle(index, row){
         console.log('这是第几个', index)
@@ -201,6 +218,28 @@
         console.log(cid)
         this.$router.push({name: 'secondList', params: { cid: cid } })
       },
+      setCourseSection(){
+        var _self = this 
+        addCourseSection({
+          "courseCategorLevel": 0,
+          "courseCategorParentId": 0,
+          "courseCategoryDescription": "这是一个描述",
+          "courseCategoryEname": "lol",
+          "courseCategoryId": 0,
+          "courseCategoryName": "英雄联盟",
+          "courseCategoryOrder": 0,
+          "courseCategoryThumbnailUrl":"http://img.pifupai.cn/games/photos/20170405/xwmATNpnHn.jpg@!w308_h560",
+          "id": 0,
+          "idStr": "110"
+        }).then(function(res, b){
+
+            // if(res.code === 0) {
+            //     _self.$router.push({path: '/home'})
+            // }
+            console.log(res)
+        })
+
+      },
       onSubmit(formName){
         var _self = this
         _self.onRuleForm(formName, function(){
@@ -209,6 +248,7 @@
           if(_self.isEditorStatus) {
             // console.log(newData,_self.curEditorRowIndex, _self.ruleForm)
             _self.formartData(_self.curEditorRowIndex, _self.ruleForm)
+            
             // _self.$set(_self.tableData2, _self.curEditorRowIndex, _self.ruleForm)
           }else {
             //_self.tableData2.push(newData)
@@ -216,9 +256,9 @@
 
             _self.tableData2.push(cateRow)
           }
-
+          
           _self.dialog.visible = false 
-
+          _self.setCourseSection()
         })
 
         _self.submitLoading = false
