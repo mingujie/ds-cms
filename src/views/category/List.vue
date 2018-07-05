@@ -7,40 +7,46 @@
     </el-row>
      <el-table
       :data="tableData2"
+      v-loading="tableLoading"
       width="50%"
       border
       class="ds-table"
       :row-class-name="tableRowClassName">
       <el-table-column
-        prop="cid"
+        prop="courseCategoryId"
         label="ID"
         width="60">
       </el-table-column>
       <el-table-column
-        prop="cateName"
+        prop="courseCategoryName"
         label="分类名称（中文）"
         width="180">
       </el-table-column>
       <el-table-column
-        prop="ename"
+        prop="courseCategoryEname"
         label="分类名称（英文）"
         width="180">
       </el-table-column>
       <el-table-column
-        prop="cateThumb"
+        prop="courseCategoryThumbnailUrl"
         label="缩略图"
-        width="120">
+        width="120">321133123
+          <template slot-scope="scope">
+            <div class="table-pic">
+              <img v-if="scope.row.courseCategoryThumbnailUrl" :src="scope.row.courseCategoryThumbnailUrl" />
+            </div>
+          </template>
       </el-table-column>
       <el-table-column
-        prop="scateCount"
-        label="二级分类(个)"
+        prop="childCount"
+        label="子分类(个)"
         width="160">
       </el-table-column>
-      <el-table-column
+<!--       <el-table-column
         prop="tcateCount"
         width="160"
         label="三级分类（个）">
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         label="操作">
         <template slot-scope="scope">
@@ -50,11 +56,12 @@
         </template>
       </el-table-column>
     </el-table>
-    <div class="ds-pagination">
+    <div class="ds-pagination" v-if="pagination.total > 1">
       <el-pagination
         background
         layout="prev, pager, next"
-        :total="100">
+        @current-change="onChangePagination"
+        :total="pagination.total">
       </el-pagination>
     </div>
     <el-dialog
@@ -114,23 +121,21 @@
           title: '新增分类',
           visible: false
         },
+        tableLoading: true,
         submitLoading: false,
         isEditorStatus: false,
         curEditorRowIndex: 0,
-        tableData2: [{
-          cid: 122,
-          cateName: '一级类目名称',
-          scateCount: 8,
-          tcateCount: 101,
-          cateThumb: '缩略图',
-          desc: '这是一个描述',
-          ename: 'heelo'
-        }],
+        tableData2: [],
       ruleForm: {
         ename: '',
         name: '',
         desc: '',
         thumb: ''
+      },
+      pagination: {
+        total: 1,
+        pageNum: 1,
+        pageSize: 10
       },
       rules: {
         name: [
@@ -145,7 +150,8 @@
       }
     },
     created(){
-      this.renderCourseSectionPage()
+      var _self = this
+      _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize)
     },
     methods: {
       tableRowClassName({row, rowIndex}) {
@@ -156,18 +162,24 @@
         }
         return '';
       },
-      renderCourseSectionPage(){
+      _getCourseSectionPage(pageNum, pageSize){
+        var _self = this
         getCourseSectionPage({
-            pageNum: 1,
-            pageSize: 10
-        }).then(function(res, b){
-
-            if(res.code === 0) {
-                
+            pageNum: pageNum,
+            pageSize: pageSize
+        }).then(function({ data }, b){
+            if(data.code === 0 && data.data.list.length) {
+              _self.tableData2 = data.data.list
+              _self.tableLoading = false
+              _self.pagination.total = parseInt(data.data.total)
             }
-            console.log(a,b)
+            console.log('hello',_self.tableData2,data)
         })
 
+      },
+      onChangePagination(pageNum){
+        var _self = this
+        _self._getCourseSectionPage(pageNum, _self.pagination.pageSize)
       },
       onEditorHandle(index, row){
         console.log('这是第几个', index)
@@ -218,32 +230,38 @@
         console.log(cid)
         this.$router.push({name: 'secondList', params: { cid: cid } })
       },
-      setCourseSection(){
+      setCourseSection(ruleForm){
         var _self = this 
-        addCourseSection({
-          "courseCategorLevel": 0,
-          "courseCategorParentId": 0,
-          "courseCategoryDescription": "这是一个描述",
-          "courseCategoryEname": "lol",
-          "courseCategoryId": 0,
-          "courseCategoryName": "英雄联盟",
-          "courseCategoryOrder": 0,
-          "courseCategoryThumbnailUrl":"http://img.pifupai.cn/games/photos/20170405/xwmATNpnHn.jpg@!w308_h560",
-          "id": 0,
-          "idStr": "110"
-        }).then(function(res, b){
 
-            // if(res.code === 0) {
-            //     _self.$router.push({path: '/home'})
-            // }
-            console.log(res)
+        return addCourseSection({
+          "courseCategorLevel": '',
+          "courseCategorParentId": '',
+          "courseCategoryDescription": ruleForm.desc,
+          "courseCategoryEname": ruleForm.ename,
+          "courseCategoryId": '',
+          "courseCategoryName": ruleForm.name,
+          "courseCategoryOrder": '',
+          "courseCategoryThumbnailUrl": ruleForm.thumb,
+          "id": '',
+          "idStr": ''
+        }).then(function(res){
+          var status = false 
+          if(res.code === 0) {
+            status =  true 
+            console.log('添加成功', res)
+          }else {
+            _self.$message({
+              message: res.message,
+              type: 'warning'
+            });
+          }
+          return status
         })
-
       },
       onSubmit(formName){
         var _self = this
         _self.onRuleForm(formName, function(){
-          console.log(formName)
+
           // var newData = _self.formartData(_self.ruleForm)
           if(_self.isEditorStatus) {
             // console.log(newData,_self.curEditorRowIndex, _self.ruleForm)
@@ -252,16 +270,26 @@
             // _self.$set(_self.tableData2, _self.curEditorRowIndex, _self.ruleForm)
           }else {
             //_self.tableData2.push(newData)
-            var cateRow = _self.createCateRow(_self.ruleForm)
+            _self.setCourseSection(_self.ruleForm)
+            .then(function(status){
+              if(status) {
+                _self.submitLoading = false
+                _self.dialog.visible = false
+                _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize)
+              }
+              console.log('成功么', status)
+            })
 
-            _self.tableData2.push(cateRow)
+            // var cateRow = _self.createCateRow(_self.ruleForm)
+
+            // _self.tableData2.push(cateRow)
           }
           
-          _self.dialog.visible = false 
-          _self.setCourseSection()
+          //_self.dialog.visible = false 
+          
         })
 
-        _self.submitLoading = false
+        //_self.submitLoading = false
       },
       createCateRow(form){
         var _self = this
