@@ -51,7 +51,7 @@
         label="操作">
         <template slot-scope="scope">
           <el-button @click="onEditorHandle(scope.$index, scope.row)" type="text" size="small">编辑</el-button>
-          <el-button type="text" size="small" @click="onDeleteRow(scope.$index, tableData2)">删除</el-button>
+          <el-button type="text" size="small" @click="onDeleteRow(scope.$index, scope.row)">删除</el-button>
           <el-button type="text" size="small" @click="onChangeCategory(scope.row.cid)">增(改)子分类</el-button>
         </template>
       </el-table-column>
@@ -69,13 +69,14 @@
       :visible.sync="dialog.visible"
       width="50%"
       class="ds-dialog"
+      @close="closeDialogHandle"
       :before-close="handleClose">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" style="padding-right: 10px;">
-          <el-form-item label="中文名称" prop="name">
-            <el-input v-model="ruleForm.name" placeholder="请输入中文名称"></el-input>
+          <el-form-item label="中文名称" prop="courseCategoryName">
+            <el-input v-model="ruleForm.courseCategoryName" placeholder="请输入中文名称"></el-input>
           </el-form-item>
-          <el-form-item label="英文名称" prop="ename">
-            <el-input placeholder="请输入英文名称" v-model="ruleForm.ename"></el-input>
+          <el-form-item label="英文名称" prop="courseCategoryEname">
+            <el-input placeholder="请输入英文名称" v-model="ruleForm.courseCategoryEname"></el-input>
           </el-form-item>
           <el-form-item label="缩略图">
             <el-upload
@@ -84,12 +85,12 @@
               :show-file-list="false"
               :on-success="handleAvatarSuccess"
               :before-upload="beforeAvatarUpload">
-              <img v-if="ruleForm.thumb" :src="ruleForm.thumb" class="ds-avatar">
+              <img v-if="ruleForm.courseCategoryThumbnailUrl" :src="ruleForm.courseCategoryThumbnailUrl" class="ds-avatar">
               <i v-else class="el-icon-plus ds-avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
-          <el-form-item label="描述" prop="copyright">
-            <el-input type="textarea" :rows="3" placeholder="请输入分类描述" v-model="ruleForm.desc"></el-input>
+          <el-form-item label="描述" prop="courseCategoryDescription">
+            <el-input type="textarea" :rows="3" placeholder="请输入分类描述" v-model="ruleForm.courseCategoryDescription"></el-input>
           </el-form-item>
         </el-form>      
         <span slot="footer" class="dialog-footer">
@@ -111,7 +112,11 @@
 </style>
 
 <script>
-  import { getCourseSectionPage, addCourseSection } from '@/api/'
+  import { 
+    getCourseSectionPage, 
+    addCourseSection,
+    deleteCourseSection,
+    putCourseSection } from '@/api/'
   export default {
 
     data() {
@@ -126,22 +131,17 @@
         isEditorStatus: false,
         curEditorRowIndex: 0,
         tableData2: [],
-      ruleForm: {
-        ename: '',
-        name: '',
-        desc: '',
-        thumb: ''
-      },
+      ruleForm: {},
       pagination: {
         total: 1,
         pageNum: 1,
         pageSize: 10
       },
       rules: {
-        name: [
+        courseCategoryName: [
           { required: true, message: '请输入中文名称', trigger: 'blur' }
         ],
-        ename: [
+        courseCategoryEname: [
           { required: true, message: '请输入英文名称', trigger: 'blur' }
         ]
 
@@ -162,6 +162,10 @@
         }
         return '';
       },
+      closeDialogHandle(){
+        var _self = this
+        _self.$refs['ruleForm'].resetFields();
+      },
       _getCourseSectionPage(pageNum, pageSize){
         var _self = this
         getCourseSectionPage({
@@ -173,7 +177,6 @@
               _self.tableLoading = false
               _self.pagination.total = parseInt(data.data.total)
             }
-            console.log('hello',_self.tableData2,data)
         })
 
       },
@@ -182,12 +185,12 @@
         _self._getCourseSectionPage(pageNum, _self.pagination.pageSize)
       },
       onEditorHandle(index, row){
-        console.log('这是第几个', index)
         var ruleForm = this.ruleForm
-        ruleForm.ename = row.ename
-        ruleForm.name = row.cateName
-        ruleForm.desc = row.cateDesc,
-        ruleForm.thumb =  row.cateThumb
+        ruleForm.courseCategoryId = row.courseCategoryId
+        ruleForm.courseCategoryEname = row.courseCategoryEname
+        ruleForm.courseCategoryName = row.courseCategoryName
+        ruleForm.courseCategoryDescription = row.courseCategoryDescription
+        ruleForm.courseCategoryThumbnailUrl =  row.courseCategoryThumbnailUrl
         this.dialog.title = "编辑分类"
         this.dialog.visible = true
         this.curEditorRowIndex = index
@@ -199,7 +202,6 @@
       },
       handleClose(done) {
         var _self = this
-        console.log(typeof(done), '这是')
         _self.$confirm('确认关闭？')
           .then(_ => {
             if(typeof(done) === 'function') {
@@ -207,7 +209,7 @@
             }else {
               _self.dialog.visible = false
             }
-            _self.$refs['ruleForm'].resetFields();
+            //_self.$refs['ruleForm'].resetFields();
             
           })
           .catch(_ => {});
@@ -220,17 +222,66 @@
       beforeAvatarUpload(){
 
       },
-      onDeleteRow(index, rows) {
-        // var _self = this
-        this.confirm({}, function(){
-          rows.splice(index, 1);
+      onDeleteRow(index, row) {
+        var _self = this
+        _self.confirm({}, function(){
+        _self._deleteCourseSectionHandle(row.courseCategoryId)
+        .then(function(status){
+            if(status){
+              // rows.splice(index, 1);
+              _self._getCourseSectionPage(1, _self.pagination.pageSize)
+            }            
+          })
         });
       },
       onChangeCategory(cid){
-        console.log(cid)
         this.$router.push({name: 'secondList', params: { cid: cid } })
       },
-      setCourseSection(ruleForm){
+      _putCourseSectionHandle(ruleForm){
+        var _self = this
+        
+        return putCourseSection({
+          "courseCategorLevel": '',
+          "courseCategorParentId": '',
+          "courseCategoryDescription": ruleForm.courseCategoryDescription,
+          "courseCategoryEname": ruleForm.courseCategoryEname,
+          "courseCategoryId": ruleForm.courseCategoryId,
+          "courseCategoryName": ruleForm.courseCategoryName,
+          "courseCategoryOrder": '',
+          "courseCategoryThumbnailUrl": ruleForm.courseCategoryThumbnailUrl,
+          "id": '',
+          "idStr": ''
+        }).then(function(res){
+          var status = false 
+          if(res.code === 0) {
+            status =  true 
+          }else {
+            _self.$message({
+              message: res.message,
+              type: 'warning'
+            });
+          }
+          return status
+        })
+      },
+      _deleteCourseSectionHandle(courseCategoryId){
+        var _self = this
+        return deleteCourseSection({
+          "id": courseCategoryId
+        }).then(function(res){
+          var status = false 
+          if(res.code === 0) {
+            status =  true 
+          }else {
+            _self.$message({
+              message: res.message,
+              type: 'warning'
+            });
+          }
+          return status
+        })
+      },
+      _addCourseSectionHandle(ruleForm){
         var _self = this 
 
         return addCourseSection({
@@ -248,7 +299,6 @@
           var status = false 
           if(res.code === 0) {
             status =  true 
-            console.log('添加成功', res)
           }else {
             _self.$message({
               message: res.message,
@@ -262,31 +312,29 @@
         var _self = this
         _self.onRuleForm(formName, function(){
 
-          // var newData = _self.formartData(_self.ruleForm)
           if(_self.isEditorStatus) {
-            // console.log(newData,_self.curEditorRowIndex, _self.ruleForm)
-            _self.formartData(_self.curEditorRowIndex, _self.ruleForm)
-            
-            // _self.$set(_self.tableData2, _self.curEditorRowIndex, _self.ruleForm)
+            _self._putCourseSectionHandle(_self.ruleForm)
+            .then(function(status){
+              if(status) {
+                _self._getCourseSectionPage(1, _self.pagination.pageSize)
+                _self.submitLoading = false
+                _self.dialog.visible = false
+
+              }
+            })
+            console.log('我在编辑呢')
+
           }else {
-            //_self.tableData2.push(newData)
-            _self.setCourseSection(_self.ruleForm)
+            _self._addCourseSectionHandle(_self.ruleForm)
             .then(function(status){
               if(status) {
                 _self.submitLoading = false
                 _self.dialog.visible = false
                 _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize)
               }
-              console.log('成功么', status)
             })
-
-            // var cateRow = _self.createCateRow(_self.ruleForm)
-
-            // _self.tableData2.push(cateRow)
           }
-          
-          //_self.dialog.visible = false 
-          
+                    
         })
 
         //_self.submitLoading = false
@@ -305,21 +353,6 @@
 
         return obj
       },
-      formartData(index, form){
-        console.log(form)
-        this.$set(this.tableData2[index], 'cateName', form.name)
-        this.$set(this.tableData2[index], 'cateThumb', form.thumb)
-        this.$set(this.tableData2[index], 'ename', form.ename)
-        //this.tableData2[index]['name'] = form.name
-        // var newObj = {
-        //   cid: form.,
-        //   name: form.name,
-        //   ename: form.ename,
-        //   thumb: form.thumb,
-        //   desc: form.desc
-        // }
-        //return newObj
-      },  
       onRuleForm(formName, callback){
         var _self = this
         _self.$refs[formName].validate((valid) => {

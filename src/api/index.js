@@ -41,3 +41,13 @@ export const getCourseSectionPage = params => {
 export const addCourseSection = params => { 
   return axios.post(`/api/course/category`, params).then(res => res.data)
 };
+
+//修改课程分分类
+export const putCourseSection = params => { 
+  return axios.put(`/api/course/category`, params).then(res => res.data)
+};
+
+//删除课程分类
+export const deleteCourseSection = params => { 
+  return axios.delete(`/api/course/category`, {data: params}).then(res => res.data)
+};
