@@ -12,12 +12,12 @@
       border
       class="ds-table"
       :row-class-name="tableRowClassName">
-      <el-table-column
+<!--       <el-table-column
         prop="courseCategoryId"
         label="ID"
         width="60">
       </el-table-column>
-      <el-table-column
+ -->      <el-table-column
         prop="courseCategoryName"
         label="分类名称（中文）"
         width="180">
@@ -52,7 +52,7 @@
         <template slot-scope="scope">
           <el-button @click="onEditorHandle(scope.$index, scope.row)" type="text" size="small">编辑</el-button>
           <el-button type="text" size="small" @click="onDeleteRow(scope.$index, scope.row)">删除</el-button>
-          <el-button type="text" size="small" @click="onChangeCategory(scope.row.cid)">增(改)子分类</el-button>
+          <el-button type="text" size="small" @click="onChangeCategory(scope.row.courseCategoryId)">增(改)子分类</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -131,7 +131,12 @@
         isEditorStatus: false,
         curEditorRowIndex: 0,
         tableData2: [],
-      ruleForm: {},
+      ruleForm: {
+        level: 0
+      },
+      router: {
+        cid: ''
+      },
       pagination: {
         total: 1,
         pageNum: 1,
@@ -149,11 +154,41 @@
 
       }
     },
-    created(){
-      var _self = this
-      _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize)
+    watch: {
+        '$route'(to, from){
+          console.log('路由',to)
+          if(to.name === 'secondList'){
+            this.router.cid = to.params.cid
+            console.log(to.params.cid)
+          }else if(to.name === 'thirdList'){
+
+          }else {
+
+          }
+
+        }
     },
+    created(res){
+      console.log('也开请求',this.$route)
+      var _self = this
+
+      _self.categoryChangeHandle(this.$route)
+      // _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize)
+    },
+
     methods: {
+      categoryChangeHandle(router){
+        var _self = this, cid = '';
+        if(router.name === 'secondList' && router.params.cid){
+          cid = router.params.cid
+        }else if(router.name === 'thirdList' && router.params.cid){
+          cid = router.params.cid
+        }else {
+          cid = ''
+        }
+        _self.$set(_self.router, 'cid', cid)
+        _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize, cid)
+      },
       tableRowClassName({row, rowIndex}) {
         if (rowIndex === 1) {
           return 'warning-row';
@@ -166,17 +201,19 @@
         var _self = this
         _self.$refs['ruleForm'].resetFields();
       },
-      _getCourseSectionPage(pageNum, pageSize){
+      _getCourseSectionPage(pageNum, pageSize, cid){
         var _self = this
         getCourseSectionPage({
             pageNum: pageNum,
-            pageSize: pageSize
+            pageSize: pageSize,
+            parentId: cid
         }).then(function({ data }, b){
             if(data.code === 0 && data.data.list.length) {
               _self.tableData2 = data.data.list
-              _self.tableLoading = false
               _self.pagination.total = parseInt(data.data.total)
             }
+
+            _self.tableLoading = false
         })
 
       },
@@ -186,7 +223,7 @@
       },
       onEditorHandle(index, row){
         var ruleForm = this.ruleForm
-        ruleForm.courseCategoryId = row.courseCategoryId
+        // ruleForm.courseCategoryId = row.courseCategoryId
         ruleForm.courseCategoryEname = row.courseCategoryEname
         ruleForm.courseCategoryName = row.courseCategoryName
         ruleForm.courseCategoryDescription = row.courseCategoryDescription
@@ -287,12 +324,12 @@
         return addCourseSection({
           "courseCategorLevel": '',
           "courseCategorParentId": '',
-          "courseCategoryDescription": ruleForm.desc,
-          "courseCategoryEname": ruleForm.ename,
+          "courseCategoryDescription": ruleForm.courseCategoryDescription,
+          "courseCategoryEname": ruleForm.courseCategoryEname,
           "courseCategoryId": '',
-          "courseCategoryName": ruleForm.name,
+          "courseCategoryName": ruleForm.courseCategoryName,
           "courseCategoryOrder": '',
-          "courseCategoryThumbnailUrl": ruleForm.thumb,
+          "courseCategoryThumbnailUrl": ruleForm.courseCategoryThumbnailUrl,
           "id": '',
           "idStr": ''
         }).then(function(res){
@@ -310,8 +347,8 @@
       },
       onSubmit(formName){
         var _self = this
-        _self.onRuleForm(formName, function(){
 
+        _self.onRuleForm(formName, function(){
           if(_self.isEditorStatus) {
             _self._putCourseSectionHandle(_self.ruleForm)
             .then(function(status){

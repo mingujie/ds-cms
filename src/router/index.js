@@ -92,7 +92,7 @@ export default new Router({
         path: '/category/second_list/:cid',
         name: 'secondList',
         cname: '二级分类列表',
-        component: SecondCategoryList,
+        component: CategoryList,
         hidden: true
       },{
         path: '/category/third_list/:cid',
