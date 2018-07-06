@@ -12,12 +12,12 @@ module.exports = {
     assetsPublicPath: '/',
     //proxyTable: {},
     proxyTable: {
-        '/api': {
+        '/course/**': {
             //target:'http://shop.dmp.hzjiehun.bid',//拣难
             target:'http://121.40.241.35:9091',//力丰
             changeOrigin: true,
             pathRewrite: {
-                '^/api': '/api',
+                '^/course': '/course',
             }
         }
     },

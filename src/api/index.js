@@ -13,13 +13,13 @@ console.log('请求了')
 };
 
 export const createCourseCategory = params => { 
-  return axios.post('/api/course/category', params).then(res => res.data)
+  return axios.post('/course/category', params).then(res => res.data)
 };
 
 
 //课程创建
 export const createCourseSubject = params => { 
-  return axios.post('/api/course/subject', params).then(res => res.data)
+  return axios.post('/course/subject', params).then(res => res.data)
 };
 
 
@@ -31,7 +31,7 @@ export const createCourseSubject = params => {
  * @return {[type]}        [description]
  */
 export const getCourseSectionPage = params => { 
-  return axios.get(`/api/course/category/page`, { params: params });
+  return axios.get(`/course/category/page`, { params: params });
 };
 /**
  * addCourseSection 新增课程分类
@@ -39,15 +39,15 @@ export const getCourseSectionPage = params => {
  * @return {[type]}        [description]
  */
 export const addCourseSection = params => { 
-  return axios.post(`/api/course/category`, params).then(res => res.data)
+  return axios.post(`/course/category`, params).then(res => res.data)
 };
 
 //修改课程分分类
 export const putCourseSection = params => { 
-  return axios.put(`/api/course/category`, params).then(res => res.data)
+  return axios.put(`/course/category`, params).then(res => res.data)
 };
 
 //删除课程分类
 export const deleteCourseSection = params => { 
-  return axios.delete(`/api/course/category`, {data: params}).then(res => res.data)
+  return axios.delete(`/course/category`, {data: params}).then(res => res.data)
 };
