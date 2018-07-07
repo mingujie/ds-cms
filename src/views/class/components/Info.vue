@@ -38,16 +38,17 @@
             </el-form-item>
             <el-form-item label="课程等级" prop="courseSubjectLevel">
                 <el-select v-model="ruleForm.courseSubjectLevel" placeholder="选择等级">
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
+                    <el-option label="初级" :value="1"></el-option>
+                    <el-option label="中级" :value="2"></el-option>
+                    <el-option label="高级" :value="3"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="课程价格" prop="courseSubjectPrice">
-                <el-radio-group v-model="ruleForm.courseSubjectPrice">
-                    <el-radio label="免费"></el-radio>
-                    <el-radio label="付费"></el-radio>
+                <el-radio-group @change="priceChangeHandle" v-model="initRuleForm.priceType">
+                    <el-radio label="free">免费</el-radio>
+                    <el-radio label="pay">付费</el-radio>
                 </el-radio-group>
-                <div v-if="!ruleForm.courseSubjectPrice == ''">
+                <div v-if="initRuleForm.priceType === 'pay'">
                     <p>课程价格最多只能输入2位小数</p>
                     <el-input v-model="ruleForm.courseSubjectPrice" class="w50" placeholder="课程价格"></el-input>
                 </div>
@@ -63,8 +64,8 @@
                 </el-select>
             </el-form-item>
 
-            <el-form-item label="课程详情" prop="detail">
-                <div ref="editor" style="text-align:left"></div>
+            <el-form-item label="课程详情" prop="cmsContentText">
+                <div ref="editor" style="text-align:left;position: relative;z-index: 1;" ></div>
                 <!-- <button @click="getContent">查看内容</button> -->
             </el-form-item>
             
@@ -85,21 +86,20 @@ export default {
   data() {
     return {
 		    ruleForm: {
-          "cmsContentId": 0,
-          "cmsContentText": "string",
-          "courseCategoryId": 0,
-          "courseSubjectId": 0,
-          "courseSubjectLevel": 0,
-          "courseSubjectPrice": 0,
-          "courseSubjectSummary": "string",
-          "courseSubjectTeacher": "string",
-          "courseSubjectThumbnailUrl": "string",
-          "courseSubjectTitle": "string",
-          "id": 0,
-          "idStr": "string",
-          "tagCodes": [
-            "string"
-          ]
+          "cmsContentId": "",
+          "cmsContentText": "",
+          "courseCategoryId": "",
+          "courseSubjectId": "",
+          "courseSubjectLevel": "",
+          "courseSubjectPrice": "",
+          "courseSubjectSummary": "",
+          "courseSubjectTeacher": "",
+          "courseSubjectThumbnailUrl": "",
+          "courseSubjectTitle": "",
+          "tagCodes": []
+        },
+        initRuleForm: {
+          priceType: '' //free or Pay
         },
         imageUrl: '',
         rules: {
@@ -141,11 +141,25 @@ export default {
     },
     created(res){
       var _self = this
+      _self.initRuleFormHandle()
       _self.routeChangeHandle(_self.$router)
 
     },
 
   methods: {
+    initRuleFormHandle(){
+      var ruleForm = this.ruleForm , 
+          initRuleForm = this.initRuleForm;
+      initRuleForm.priceType = this.getPriceTypeHandle(ruleForm, initRuleForm)
+
+    },
+    getPriceTypeHandle(ruleForm, initRuleForm){
+      var value = 'free'
+      if(ruleForm.courseSubjectPrice) {
+        value = 'pay'
+      }
+      return value
+    },
     routeChangeHandle(router){
       var _self = this
       if(router.ename === 'editorCourse' && router.param.cid){
@@ -165,23 +179,10 @@ export default {
       })
     },
   createCourseSubjectHandle (ruleForm){
-    createCourseSubject({
-      "cmsContentId": "",
-      "cmsContentText": ruleForm.cmsContentText,
-      "courseCategoryId": ruleForm.courseCategoryId || '',
-      "courseSubjectId": "",
-      "courseSubjectLevel": ruleForm.courseSubjectLevel,
-      "courseSubjectPrice": ruleForm.courseSubjectPrice || 0,
-      "courseSubjectSummary": ruleForm.courseSubjectSummary,
-      "courseSubjectTeacher": ruleForm.courseSubjectTeacher,
-      "courseSubjectThumbnailUrl": ruleForm.courseSubjectThumbnailUrl,
-      "courseSubjectTitle": ruleForm.courseSubjectTitle,
-      "id": "",
-      "idStr": "",
-      "tagCodes": [
-        "string"
-      ]
-    }).then(function(res){
+    var _self = this
+    createCourseSubject(_self.formartData(ruleForm))
+    .then(function(res){
+      
       console.log('课程创建', res)
     })
   },
@@ -191,26 +192,23 @@ export default {
   formartData(ruleForm){
     var _self = this, 
     data = {
-      "cmsContentId": 0,
+      "cmsContentId": "",
       "cmsContentText": ruleForm.cmsContentText,
       "courseCategoryId": ruleForm.courseCategoryId,
-      "courseSubjectId": 0,
+      "courseSubjectId": "",
       "courseSubjectLevel": ruleForm.courseSubjectLevel,
       "courseSubjectPrice": ruleForm.courseSubjectPrice,
       "courseSubjectSummary": ruleForm.courseSubjectSummary,
       "courseSubjectTeacher": ruleForm.courseSubjectTeacher,
       "courseSubjectThumbnailUrl": ruleForm.courseSubjectThumbnailUrl,
       "courseSubjectTitle": ruleForm.courseSubjectTitle,
-      "id": 0,
-      "idStr": "string",
-      "tagCodes": [
-        "string"
-      ]      
+      "tagCodes": ruleForm.tagCodes  
     };
     return data
   },
 	submitForm(formName) {
     var _self = this
+      //console.log(_self.ruleForm)
         _self.$refs[formName].validate((valid) => {
             if (valid) {
               _self.createCourseSubjectHandle(_self.ruleForm)
@@ -220,6 +218,13 @@ export default {
                 return false;
             }
         });
+    },
+    priceChangeHandle(value){
+      console.log(value)
+      if(value === 'free') {
+        this.ruleForm.courseSubjectPrice = 0
+      }
+      console.log(value)
     },
     resetForm(formName) {
         this.$refs[formName].resetFields();

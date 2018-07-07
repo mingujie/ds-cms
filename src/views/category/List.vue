@@ -38,6 +38,7 @@
         width="160">
       </el-table-column>
       <el-table-column
+        fixed="right"
         label="操作">
         <template slot-scope="scope">
           <el-button @click="onEditorHandle(scope.$index, scope.row)" type="text" size="small">编辑</el-button>
