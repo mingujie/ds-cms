@@ -62,7 +62,7 @@
       :visible.sync="dialog.visible"
       width="50%"
       class="ds-dialog"
-      @close="closeDialogHandle"
+      @closed="closeDialogHandle"
       :before-close="handleClose">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" style="padding-right: 10px;">
           <el-form-item label="中文名称" prop="courseCategoryName">
@@ -132,7 +132,8 @@
         courseCategoryLevel: 0,
         courseCategoryName: '',
         courseCategoryParentId: '',
-        courseCategoryThumbnailUrl: ''
+        courseCategoryThumbnailUrl: '',
+        courseCategoryId: ''
       },
       router: {
         cid: ''
@@ -154,29 +155,18 @@
       }
     },
     watch: {
-        '$route'(to, from){
-          console.log('路由',to)
-          this.categoryChangeHandle(to)
-          // if(to.name === 'secondList'){
-          //   this.router.cid = to.params.cid
-          //   console.log(to.params.cid)
-          // }else if(to.name === 'thirdList'){
-
-          // }else {
-
-          // }
-
-        }
+      '$route'(to, from){
+        this.categoryChangeHandle(to)
+      }
     },
     created(res){
-      console.log('也开请求',this.$route)
-      var _self = this
 
+      var _self = this
       _self.categoryChangeHandle(this.$route)
-      // _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize)
     },
 
     methods: {
+
       categoryChangeHandle(router){
         var _self = this, 
             cid = '', 
@@ -197,7 +187,6 @@
           isShowRouter = false
           //routerName = "thirdList"
         }
-
         _self.cateBtnName = cateBtnName
         _self.ruleForm.courseCategoryLevel  = courseCategoryLevel
         _self.ruleForm.courseCategoryParentId = cid
@@ -205,6 +194,13 @@
         _self.isShowRouter = isShowRouter
         _self.$set(_self.router, 'cid', cid)
         _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize, cid)
+      },
+      formartRuleForm(){
+        var ruleForm = this.ruleForm
+        ruleForm.courseCategoryDescription = ''
+        ruleForm.courseCategoryEname = ''
+        ruleForm.courseCategoryName = ''
+        ruleForm.courseCategoryThumbnailUrl = ''
       },
       tableRowClassName({row, rowIndex}) {
         if (rowIndex === 1) {
@@ -216,6 +212,7 @@
       },
       closeDialogHandle(){
         var _self = this
+        //alert('我会被关闭么')
         _self.$refs['ruleForm'].resetFields();
       },
       _getCourseSectionPage(pageNum, pageSize, cid){
@@ -226,18 +223,16 @@
             parentId: cid
         }).then(function(res){
             console.log('获取课程列表', res)
-            if(res.code === 0) {
-              if(!res.data.list.length){
-                console.log('nihaoaaa')
-                _self.tableData = []
-              }else {
-                _self.tableData = res.data.list
-                _self.pagination.total = parseInt(res.data.total)
-              }
-              
+          if(res.code === 0) {
+            if(!res.data.list.length){
+              console.log('nihaoaaa')
+              _self.tableData = []
+            }else {
+              _self.tableData = res.data.list
+              _self.pagination.total = parseInt(res.data.total)
             }
-
-            _self.tableLoading = false
+          }
+          _self.tableLoading = false
         })
 
       },
@@ -262,6 +257,8 @@
       onAddCategoryHandle(){
         this.dialog.visible = true
         this.dialog.title = "添加分类"
+        this.isEditorStatus = false
+        this.formartRuleForm()
       },
       handleClose(done) {
         var _self = this
@@ -269,6 +266,7 @@
           .then(_ => {
             if(typeof(done) === 'function') {
               done();
+
             }else {
               _self.dialog.visible = false
             }
@@ -277,7 +275,7 @@
           })
           .catch(_ => {});
 
-        _self.isEditorStatus = false
+        //_self.isEditorStatus = false
       },
       handleAvatarSuccess(){
 
