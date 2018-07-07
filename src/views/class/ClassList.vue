@@ -29,9 +29,9 @@
 		label="操作"
 		width="100">
 		<template slot-scope="scope">
-			<el-button type="text" @click="toDetail">编辑</el-button>
-			<el-button type="text">删除</el-button>
-			<el-button type="text">增加课件</el-button>
+			<el-button type="text" size="small" @click="toDetail(scope.row.courseSubjectId)">编辑</el-button>
+			<el-button type="text" size="small" @click="onDeleteRow(scope.$index, scope.row)">删除</el-button>
+			<el-button type="text" size="small">增加课件</el-button>
 		</template>
 	  </el-table-column>
     </el-table>
@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { getCourseSubjectPage  } from '@/api/'
+import { getCourseSubjectPage, deleteCourseSubject  } from '@/api/'
 export default {
   data() {
     return {
@@ -71,7 +71,7 @@ export default {
   },
     created(res){
      	var _self = this
-    	_self._getCourseSubjectHandle(_self.pagination.pageNum, _self.pagination.pageSize)
+    	_self.getCourseSubjectHandle(_self.pagination.pageNum, _self.pagination.pageSize)
     },
 
 	methods: {
@@ -79,7 +79,7 @@ export default {
 			
 		},
 
-		_getCourseSubjectHandle(pageNum, pageSize){
+		getCourseSubjectHandle(pageNum, pageSize){
 			var _self = this
 			getCourseSubjectPage({
 	            pageNum: pageNum,
@@ -102,17 +102,60 @@ export default {
 		},
 	      onChangePagination(pageNum){
 	        var _self = this
-	        _self._getCourseSectionPage(pageNum, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
+	        _self.getCourseSubjectHandle(pageNum, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
 	      },
-		handleSizeChange(val) {
-			console.log(`每页 ${val} 条`);
+		toDetail(cid) {
+			this.$router.push({name: '编辑课程', params: { cid: cid } })
 		},
-		handleCurrentChange(val) {
-			console.log(`当前页: ${val}`);
+		deleteCourseSubjectHandle(courseSubjectId){
+	        var _self = this
+	        return deleteCourseSubject({
+	          "id": courseSubjectId
+	        }).then(function(res){
+	          var status = false 
+	          if(res.code === 0) {
+	            status =  true 
+	          }else {
+	            _self.$message({
+	              message: res.message,
+	              type: 'warning'
+	            });
+	          }
+	          return status
+	        })
 		},
-		toDetail() {
-			this.$router.push('/class/detail')
-		}
+
+      onDeleteRow(index, row) {
+        var _self = this
+        _self.confirm({}, function(){
+        _self.deleteCourseSubjectHandle(row.courseSubjectId)
+        .then(function(status){
+            if(status){
+              // rows.splice(index, 1);
+              _self.getCourseSubjectHandle(_self.pagination.pageNum, _self.pagination.pageSize)
+            }            
+          })
+        });
+      },
+      confirm(options, callback) {
+        this.$confirm('此操作将永久删除该分类及其子分类，你确定删除吗？', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+
+          callback()
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        }).catch(() => {
+          // this.$message({
+          //   type: 'info',
+          //   message: '已取消删除'
+          // });          
+        });
+      }
   }
 }
 </script>

@@ -109,7 +109,7 @@
   import { 
     getCourseSectionPage, 
     addCourseSection,
-    deleteCourseSection,
+    deleteCourseCategory,
     putCourseSection } from '@/api/'
   export default {
 
@@ -287,7 +287,7 @@
       onDeleteRow(index, row) {
         var _self = this
         _self.confirm({}, function(){
-        _self._deleteCourseSectionHandle(row.courseCategoryId)
+        _self._deleteCourseCategoryHandle(row.courseCategoryId)
         .then(function(status){
             if(status){
               // rows.splice(index, 1);
@@ -325,9 +325,9 @@
           return status
         })
       },
-      _deleteCourseSectionHandle(courseCategoryId){
+      _deleteCourseCategoryHandle(courseCategoryId){
         var _self = this
-        return deleteCourseSection({
+        return deleteCourseCategory({
           "id": courseCategoryId
         }).then(function(res){
           var status = false 

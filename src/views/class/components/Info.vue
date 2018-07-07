@@ -142,7 +142,7 @@ export default {
     created(res){
       var _self = this
       _self.initRuleFormHandle()
-      _self.routeChangeHandle(_self.$router)
+      _self.routeChangeHandle(_self.$route)
 
     },
 
@@ -162,9 +162,11 @@ export default {
     },
     routeChangeHandle(router){
       var _self = this
-      if(router.ename === 'editorCourse' && router.param.cid){
+      console.log('路由',router)
+      if(router.name == '编辑课程' && router.params.cid){
         _self.isEditorStatus = true
-        _self.getCourseSubjectDetailHandle(router.param.cid)
+        _self.getCourseSubjectDetailHandle(router.params.cid)
+        return
       }
       _self.getCourseSubjectDetailHandle()
     },
@@ -194,10 +196,10 @@ export default {
     data = {
       "cmsContentId": "",
       "cmsContentText": ruleForm.cmsContentText,
-      "courseCategoryId": ruleForm.courseCategoryId,
+      "courseCategoryId": ruleForm.courseCategoryId || "2",
       "courseSubjectId": "",
       "courseSubjectLevel": ruleForm.courseSubjectLevel,
-      "courseSubjectPrice": ruleForm.courseSubjectPrice,
+      "courseSubjectPrice": ruleForm.courseSubjectPrice || 0,
       "courseSubjectSummary": ruleForm.courseSubjectSummary,
       "courseSubjectTeacher": ruleForm.courseSubjectTeacher,
       "courseSubjectThumbnailUrl": ruleForm.courseSubjectThumbnailUrl,
@@ -244,9 +246,9 @@ export default {
         }
         return isJPG && isLt2M;
       },
-      getContent: function () {
+    getContent: function () {
         alert(this.editorContent)
-    }
+    }  
   }
 }
 </script>

@@ -61,7 +61,7 @@ export default new Router({
         name: '课程详情',
         component: ClassDetail,
         children:[{
-          path: '/class/detail/:sid',
+          path: '/class/detail/:cid',
           name: '编辑课程',
           ename: 'editorCourse',
           component: ClassDetail,          
