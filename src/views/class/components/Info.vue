@@ -1,13 +1,13 @@
 <template>
     <div class="class-detail-info">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="课程标题" prop="title">
-                <el-input v-model="ruleForm.title" class="w50"></el-input>
+            <el-form-item label="课程标题" prop="courseSubjectTitle">
+                <el-input v-model="ruleForm.courseSubjectTitle" class="w50"></el-input>
             </el-form-item>
-            <el-form-item label="课程简介" prop="desc">
-                <el-input type="textarea" v-model="ruleForm.desc" class="w50"></el-input>
+            <el-form-item label="课程简介" prop="courseSubjectSummary">
+                <el-input type="textarea" v-model="ruleForm.courseSubjectSummary" class="w50"></el-input>
             </el-form-item>
-            <el-form-item label="课程封面" prop="desc">
+            <el-form-item label="课程封面" prop="courseSubjectThumbnailUrl">
                 <span>图片大小为800*600，最大不超过5M，只支持JPG,PNG,GIF,JPEG格式</span>
                 <el-upload
                     class="avatar-uploader"
@@ -15,12 +15,12 @@
                     :show-file-list="false"
                     :on-success="handleAvatarSuccess"
                     :before-upload="beforeAvatarUpload">
-                    <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                    <img v-if="ruleForm.courseSubjectThumbnailUrl" :src="ruleForm.courseSubjectThumbnailUrl" class="avatar">
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
             </el-form-item>
-            <el-form-item label="课程分类" prop="region">
-                <el-select v-model="ruleForm.region" placeholder="一级分类">
+            <el-form-item label="课程分类" prop="courseCategoryId">
+                <el-select v-model="ruleForm.courseCategoryId" placeholder="一级分类">
                     <el-option label="区域一" value="shanghai"></el-option>
                     <el-option label="区域二" value="beijing"></el-option>
                 </el-select>
@@ -33,27 +33,27 @@
                     <el-option label="区域二" value="beijing"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="课程讲师" prop="teacher">
-                <el-input v-model="ruleForm.teacher" class="w50"></el-input>
+            <el-form-item label="课程讲师" prop="courseSubjectTeacher">
+                <el-input v-model="ruleForm.courseSubjectTeacher" class="w50"></el-input>
             </el-form-item>
-            <el-form-item label="课程等级" prop="level">
-                <el-select v-model="ruleForm.level" placeholder="选择等级">
+            <el-form-item label="课程等级" prop="courseSubjectLevel">
+                <el-select v-model="ruleForm.courseSubjectLevel" placeholder="选择等级">
                     <el-option label="区域一" value="shanghai"></el-option>
                     <el-option label="区域二" value="beijing"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="课程价格" prop="resource">
-                <el-radio-group v-model="ruleForm.resource">
+            <el-form-item label="课程价格" prop="courseSubjectPrice">
+                <el-radio-group v-model="ruleForm.courseSubjectPrice">
                     <el-radio label="免费"></el-radio>
                     <el-radio label="付费"></el-radio>
                 </el-radio-group>
-                <div v-if="ruleForm.resource == '付费'">
+                <div v-if="!ruleForm.courseSubjectPrice == ''">
                     <p>课程价格最多只能输入2位小数</p>
-                    <el-input v-model="ruleForm.name" class="w50" placeholder="课程价格"></el-input>
+                    <el-input v-model="ruleForm.courseSubjectPrice" class="w50" placeholder="课程价格"></el-input>
                 </div>
             </el-form-item>
-            <el-form-item label="标签" prop="tags">
-                <el-select v-model="ruleForm.tags" multiple placeholder="请选择">
+            <el-form-item label="标签" prop="tagCodes">
+                <el-select v-model="ruleForm.tagCodes" multiple placeholder="请选择">
                     <el-option
                     v-for="item in options"
                     :key="item.value"
@@ -82,40 +82,26 @@ import { createCourseSubject } from '@/api/'
 export default {
   data() {
     return {
-		ruleForm: {
-          name: '',
-          region: '',
-          date1: '',
-          date2: '',
-          delivery: false,
-          type: [],
-          resource: '免费',
-          desc: ''
+		    ruleForm: {
+          "cmsContentId": 0,
+          "cmsContentText": "string",
+          "courseCategoryId": 0,
+          "courseSubjectId": 0,
+          "courseSubjectLevel": 0,
+          "courseSubjectPrice": 0,
+          "courseSubjectSummary": "string",
+          "courseSubjectTeacher": "string",
+          "courseSubjectThumbnailUrl": "string",
+          "courseSubjectTitle": "string",
+          "id": 0,
+          "idStr": "string",
+          "tagCodes": [
+            "string"
+          ]
         },
         imageUrl: '',
         rules: {
-        //   name: [
-        //     { required: true, message: '请输入活动名称', trigger: 'blur' },
-        //     { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-        //   ],
-        //   region: [
-        //     { required: true, message: '请选择活动区域', trigger: 'change' }
-        //   ],
-        //   date1: [
-        //     { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
-        //   ],
-        //   date2: [
-        //     { type: 'date', required: true, message: '请选择时间', trigger: 'change' }
-        //   ],
-        //   type: [
-        //     { type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change' }
-        //   ],
-        //   resource: [
-        //     { required: true, message: '请选择活动资源', trigger: 'change' }
-        //   ],
-        //   desc: [
-        //     { required: true, message: '请填写活动形式', trigger: 'blur' }
-        //   ]
+
         },
         options: [{
           value: '选项1',
@@ -149,32 +135,32 @@ export default {
   },
 
   methods: {
-  setCourseSubject (){
+  createCourseSubjectHandle (ruleForm){
     createCourseSubject({
       "cmsContentId": 0,
-      "cmsContentText": "string",
-      "courseCategoryId": 0,
+      "cmsContentText": ruleForm.cmsContentText,
+      "courseCategoryId": ruleForm.courseCategoryId,
       "courseSubjectId": 0,
-      "courseSubjectLevel": 0,
-      "courseSubjectPrice": 0,
-      "courseSubjectSummary": "string",
-      "courseSubjectTeacher": "string",
-      "courseSubjectThumbnailUrl": "string",
-      "courseSubjectTitle": "string",
+      "courseSubjectLevel": ruleForm.courseSubjectLevel,
+      "courseSubjectPrice": ruleForm.courseSubjectPrice,
+      "courseSubjectSummary": ruleForm.courseSubjectSummary,
+      "courseSubjectTeacher": ruleForm.courseSubjectTeacher,
+      "courseSubjectThumbnailUrl": ruleForm.courseSubjectThumbnailUrl,
+      "courseSubjectTitle": ruleForm.courseSubjectTitle,
       "id": 0,
       "idStr": "string",
       "tagCodes": [
         "string"
       ]
     }).then(function(res){
-      console.log('课程创建')
+      console.log('课程创建', res)
     })
   },
 	submitForm(formName) {
     var _self = this
         _self.$refs[formName].validate((valid) => {
             if (valid) {
-              _self.setCourseSubject()
+              _self.createCourseSubjectHandle(_self.ruleForm)
               alert('submit!');
             } else {
                 console.log('error submit!!');

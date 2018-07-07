@@ -50,10 +50,17 @@
 </template>
 
 <script>
+import { getCourseSubjectPage } from '@/api/'
 export default {
   data() {
     return {
 		input:'',
+		isEditorStatus: false, //是否编辑模式
+		pagination: {
+			total: 1,
+			pageNum: 1,
+			pageSize: 10
+		},
         tableData: [{
             date: '2016-05-02',
             name: '王小虎',
@@ -79,11 +86,30 @@ export default {
   },
   computed: {
   },
+    created(res){
+     	var _self = this
+    	_self._getCourseSubjectHandle(_self.pagination.pageNum, _self.pagination.pageSize)
+    },
 
-  methods: {
+	methods: {
 		submit() {
 			
 		},
+		_getCourseSubjectHandle(pageNum, pageSize){
+			var _self = this
+			getCourseSubjectPage({
+	            pageNum: pageNum,
+	            pageSize: pageSize
+        	}).then(function(res){
+				if(res.code === 0) {
+
+				}
+			})
+		},
+		onEditorHandle(index, row){
+			this.isEditorStatus = true
+		},
+
 		handleSizeChange(val) {
 			console.log(`每页 ${val} 条`);
 		},

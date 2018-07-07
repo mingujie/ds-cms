@@ -59,7 +59,13 @@ export default new Router({
       },{
         path: '/class/detail',
         name: '课程详情',
-        component: ClassDetail
+        component: ClassDetail,
+        children:[{
+          path: '/class/detail/:sid',
+          name: '编辑课程',
+          ename: 'editorCourse',
+          component: ClassDetail,          
+        }]
       },{
         path: '/class/manager',
         name: '课程审核',

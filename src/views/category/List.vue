@@ -61,6 +61,7 @@
         background
         layout="prev, pager, next"
         @current-change="onChangePagination"
+        v-if="pagination.total > pagination.pageSize"
         :total="pagination.total">
       </el-pagination>
     </div>
@@ -132,7 +133,12 @@
         curEditorRowIndex: 0,
         tableData2: [],
       ruleForm: {
-        level: 0
+        courseCategoryDescription: '',
+        courseCategoryEname: '',
+        courseCategoryLevel: 0,
+        courseCategoryName: '',
+        courseCategoryParentId: '',
+        courseCategoryThumbnailUrl: ''
       },
       router: {
         cid: ''
@@ -157,14 +163,15 @@
     watch: {
         '$route'(to, from){
           console.log('路由',to)
-          if(to.name === 'secondList'){
-            this.router.cid = to.params.cid
-            console.log(to.params.cid)
-          }else if(to.name === 'thirdList'){
+          this.categoryChangeHandle(to)
+          // if(to.name === 'secondList'){
+          //   this.router.cid = to.params.cid
+          //   console.log(to.params.cid)
+          // }else if(to.name === 'thirdList'){
 
-          }else {
+          // }else {
 
-          }
+          // }
 
         }
     },
@@ -178,14 +185,25 @@
 
     methods: {
       categoryChangeHandle(router){
-        var _self = this, cid = '';
+        var _self = this, 
+            cid = '', 
+            cateBtnName = '新增一级分类',
+            courseCategoryLevel = 0;
         if(router.name === 'secondList' && router.params.cid){
           cid = router.params.cid
+          cateBtnName = '新增二级分类'
+          courseCategoryLevel = 1
         }else if(router.name === 'thirdList' && router.params.cid){
           cid = router.params.cid
-        }else {
-          cid = ''
+          cateBtnName = '新增三级分类'
+          courseCategoryLevel = 2
         }
+
+        _self.cateBtnName = cateBtnName
+        _self.ruleForm.courseCategoryLevel  = courseCategoryLevel
+        _self.ruleForm.courseCategoryParentId = cid
+
+        console.log('cid', cid)
         _self.$set(_self.router, 'cid', cid)
         _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize, cid)
       },
@@ -207,10 +225,17 @@
             pageNum: pageNum,
             pageSize: pageSize,
             parentId: cid
-        }).then(function({ data }, b){
-            if(data.code === 0 && data.data.list.length) {
-              _self.tableData2 = data.data.list
-              _self.pagination.total = parseInt(data.data.total)
+        }).then(function(res){
+            console.log('获取课程列表', res)
+            if(res.code === 0) {
+              if(!res.data.list.length){
+                console.log('nihaoaaa')
+                _self.tableData2 = []
+              }else {
+                _self.tableData2 = res.data.list
+                _self.pagination.total = parseInt(res.data.total)
+              }
+              
             }
 
             _self.tableLoading = false
@@ -219,7 +244,7 @@
       },
       onChangePagination(pageNum){
         var _self = this
-        _self._getCourseSectionPage(pageNum, _self.pagination.pageSize)
+        _self._getCourseSectionPage(pageNum, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
       },
       onEditorHandle(index, row){
         var ruleForm = this.ruleForm
@@ -266,7 +291,7 @@
         .then(function(status){
             if(status){
               // rows.splice(index, 1);
-              _self._getCourseSectionPage(1, _self.pagination.pageSize)
+              _self._getCourseSectionPage(1, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
             }            
           })
         });
@@ -321,9 +346,11 @@
       _addCourseSectionHandle(ruleForm){
         var _self = this 
 
+        console.log('这将会是1个是',ruleForm.courseCategoryParentId)
+        // return 
         return addCourseSection({
-          "courseCategorLevel": '',
-          "courseCategorParentId": '',
+          "courseCategorLevel": ruleForm.courseCategoryLevel,
+          "courseCategorParentId": ruleForm.courseCategoryParentId,
           "courseCategoryDescription": ruleForm.courseCategoryDescription,
           "courseCategoryEname": ruleForm.courseCategoryEname,
           "courseCategoryId": '',
@@ -353,7 +380,7 @@
             _self._putCourseSectionHandle(_self.ruleForm)
             .then(function(status){
               if(status) {
-                _self._getCourseSectionPage(1, _self.pagination.pageSize)
+                _self._getCourseSectionPage(1, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
                 _self.submitLoading = false
                 _self.dialog.visible = false
 
@@ -367,7 +394,7 @@
               if(status) {
                 _self.submitLoading = false
                 _self.dialog.visible = false
-                _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize)
+                _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
               }
             })
           }
