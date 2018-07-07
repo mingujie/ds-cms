@@ -104,7 +104,7 @@ export default new Router({
         path: '/category/third_list/:cid',
         name: 'thirdList',
         cname: '三级分类列表',
-        component: ThirdCategoryList,
+        component: CategoryList,
         hidden: true
       }]     
     },

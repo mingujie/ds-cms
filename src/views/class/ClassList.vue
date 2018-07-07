@@ -12,17 +12,18 @@
     <el-table
       :data="tableData"
       style="width: 100%"
+      v-loading="tableLoading"
 	  class="table-contain"	
 	  header-cell-class-name="cell-con">
-      <el-table-column prop="date" label="ID"></el-table-column>
-      <el-table-column prop="date" label="标题"></el-table-column>
-      <el-table-column prop="date" label="分类"></el-table-column>
-      <el-table-column prop="date" label="发布时间"></el-table-column>
-      <el-table-column prop="date" label="价格（元）"></el-table-column>
-      <el-table-column prop="date" label="等级"></el-table-column>
-      <el-table-column prop="name" label="教师"></el-table-column>
-      <el-table-column prop="name" label="总时长"></el-table-column>
-      <el-table-column prop="name" label="学习人数"></el-table-column>
+      <!-- <el-table-column prop="date" label="ID"></el-table-column> -->
+      <el-table-column prop="courseSubjectTitle" label="标题"></el-table-column>
+<!--       <el-table-column prop="date" label="分类"></el-table-column>
+      <el-table-column prop="date" label="发布时间"></el-table-column> -->
+      <el-table-column prop="courseSubjectPrice" label="价格（元）"></el-table-column>
+      <el-table-column prop="courseSubjectLevel" label="等级"></el-table-column>
+      <el-table-column prop="courseSubjectTeacher" label="教师"></el-table-column>
+<!--       <el-table-column prop="name" label="总时长"></el-table-column>
+      <el-table-column prop="name" label="学习人数"></el-table-column> -->
     	<el-table-column
 		fixed="right"
 		label="操作"
@@ -35,22 +36,20 @@
 	  </el-table-column>
     </el-table>
 
-	<div class="block">
-		<el-pagination
-		@size-change="handleSizeChange"
-		@current-change="handleCurrentChange"
-		:current-page="currentPage4"
-		:page-sizes="[100, 200, 300, 400]"
-		:page-size="100"
-		layout="total, sizes, prev, pager, next, jumper"
-		:total="400">
-    </el-pagination>
-  </div>
+    <div class="ds-pagination" v-if="pagination.total > 1">
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        @current-change="onChangePagination"
+        v-if="pagination.total > pagination.pageSize"
+        :total="pagination.total">
+      </el-pagination>
+    </div>
   </div>
 </template>
 
 <script>
-import { getCourseSubjectPage } from '@/api/'
+import { getCourseSubjectPage  } from '@/api/'
 export default {
   data() {
     return {
@@ -61,26 +60,10 @@ export default {
 			pageNum: 1,
 			pageSize: 10
 		},
-        tableData: [{
-            date: '2016-05-02',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1518 弄'
-          }, {
-            date: '2016-05-04',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1517 弄'
-          }, {
-            date: '2016-05-01',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1519 弄'
-          }, {
-            date: '2016-05-03',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1516 弄'
-        }]
+		tableLoading: true,
+        tableData: []
     }
   },
-
   mounted() {  
 
   },
@@ -95,6 +78,7 @@ export default {
 		submit() {
 			
 		},
+
 		_getCourseSubjectHandle(pageNum, pageSize){
 			var _self = this
 			getCourseSubjectPage({
@@ -102,14 +86,24 @@ export default {
 	            pageSize: pageSize
         	}).then(function(res){
 				if(res.code === 0) {
+					if(res.data.list.length) {
+                		_self.tableData = res.data.list
+                		_self.pagination.total = parseInt(res.data.total)
 
+					}else {
+						_self.tableData = []
+					}
 				}
+				_self.tableLoading = false
 			})
 		},
 		onEditorHandle(index, row){
 			this.isEditorStatus = true
 		},
-
+	      onChangePagination(pageNum){
+	        var _self = this
+	        _self._getCourseSectionPage(pageNum, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
+	      },
 		handleSizeChange(val) {
 			console.log(`每页 ${val} 条`);
 		},

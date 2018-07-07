@@ -6,18 +6,13 @@
       </el-col> 
     </el-row>
      <el-table
-      :data="tableData2"
+      :data="tableData"
       v-loading="tableLoading"
       width="50%"
       border
       class="ds-table"
       :row-class-name="tableRowClassName">
-<!--       <el-table-column
-        prop="courseCategoryId"
-        label="ID"
-        width="60">
-      </el-table-column>
- -->      <el-table-column
+      <el-table-column
         prop="courseCategoryName"
         label="分类名称（中文）"
         width="180">
@@ -30,7 +25,7 @@
       <el-table-column
         prop="courseCategoryThumbnailUrl"
         label="缩略图"
-        width="120">321133123
+        width="120">
           <template slot-scope="scope">
             <div class="table-pic">
               <img v-if="scope.row.courseCategoryThumbnailUrl" :src="scope.row.courseCategoryThumbnailUrl" />
@@ -42,17 +37,14 @@
         label="子分类(个)"
         width="160">
       </el-table-column>
-<!--       <el-table-column
-        prop="tcateCount"
-        width="160"
-        label="三级分类（个）">
-      </el-table-column> -->
       <el-table-column
         label="操作">
         <template slot-scope="scope">
           <el-button @click="onEditorHandle(scope.$index, scope.row)" type="text" size="small">编辑</el-button>
           <el-button type="text" size="small" @click="onDeleteRow(scope.$index, scope.row)">删除</el-button>
-          <el-button type="text" size="small" @click="onChangeCategory(scope.row.courseCategoryId)">增(改)子分类</el-button>
+          <template v-if="isShowRouter">
+            <el-button type="text" size="small" @click="onChangeCategory(scope.row.courseCategoryId)">增(改)子分类</el-button>
+          </template>
         </template>
       </el-table-column>
     </el-table>
@@ -123,6 +115,8 @@
     data() {
       return {
         cateBtnName: '新增一级分类',
+        routerName: '',
+        isShowRouter: true,
         dialog: {
           title: '新增分类',
           visible: false
@@ -131,7 +125,7 @@
         submitLoading: false,
         isEditorStatus: false,
         curEditorRowIndex: 0,
-        tableData2: [],
+        tableData: [],
       ruleForm: {
         courseCategoryDescription: '',
         courseCategoryEname: '',
@@ -155,7 +149,6 @@
         courseCategoryEname: [
           { required: true, message: '请输入英文名称', trigger: 'blur' }
         ]
-
       }
 
       }
@@ -188,22 +181,28 @@
         var _self = this, 
             cid = '', 
             cateBtnName = '新增一级分类',
-            courseCategoryLevel = 0;
+            courseCategoryLevel = 0,
+            routerName = "secondList",
+            isShowRouter = true;
         if(router.name === 'secondList' && router.params.cid){
           cid = router.params.cid
           cateBtnName = '新增二级分类'
           courseCategoryLevel = 1
+          routerName = "thirdList"
+          isShowRouter = true
         }else if(router.name === 'thirdList' && router.params.cid){
           cid = router.params.cid
           cateBtnName = '新增三级分类'
           courseCategoryLevel = 2
+          isShowRouter = false
+          //routerName = "thirdList"
         }
 
         _self.cateBtnName = cateBtnName
         _self.ruleForm.courseCategoryLevel  = courseCategoryLevel
         _self.ruleForm.courseCategoryParentId = cid
-
-        console.log('cid', cid)
+        _self.routerName = routerName
+        _self.isShowRouter = isShowRouter
         _self.$set(_self.router, 'cid', cid)
         _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize, cid)
       },
@@ -230,9 +229,9 @@
             if(res.code === 0) {
               if(!res.data.list.length){
                 console.log('nihaoaaa')
-                _self.tableData2 = []
+                _self.tableData = []
               }else {
-                _self.tableData2 = res.data.list
+                _self.tableData = res.data.list
                 _self.pagination.total = parseInt(res.data.total)
               }
               
@@ -253,10 +252,12 @@
         ruleForm.courseCategoryName = row.courseCategoryName
         ruleForm.courseCategoryDescription = row.courseCategoryDescription
         ruleForm.courseCategoryThumbnailUrl =  row.courseCategoryThumbnailUrl
+        ruleForm.courseCategoryId = row.courseCategoryId
         this.dialog.title = "编辑分类"
         this.dialog.visible = true
         this.curEditorRowIndex = index
         this.isEditorStatus = true
+        console.log('我在被编辑么')
       },
       onAddCategoryHandle(){
         this.dialog.visible = true
@@ -297,22 +298,21 @@
         });
       },
       onChangeCategory(cid){
-        this.$router.push({name: 'secondList', params: { cid: cid } })
+        var _self = this
+
+        _self.$router.push({name: _self.routerName, params: { cid: cid } })
       },
       _putCourseSectionHandle(ruleForm){
         var _self = this
         
         return putCourseSection({
-          "courseCategorLevel": '',
-          "courseCategorParentId": '',
+          "courseCategoryLevel": ruleForm.courseCategoryLevel,
+          "courseCategoryParentId": ruleForm.courseCategoryParentId,
           "courseCategoryDescription": ruleForm.courseCategoryDescription,
           "courseCategoryEname": ruleForm.courseCategoryEname,
           "courseCategoryId": ruleForm.courseCategoryId,
           "courseCategoryName": ruleForm.courseCategoryName,
-          "courseCategoryOrder": '',
-          "courseCategoryThumbnailUrl": ruleForm.courseCategoryThumbnailUrl,
-          "id": '',
-          "idStr": ''
+          "courseCategoryThumbnailUrl": ruleForm.courseCategoryThumbnailUrl
         }).then(function(res){
           var status = false 
           if(res.code === 0) {
@@ -349,16 +349,12 @@
         console.log('这将会是1个是',ruleForm.courseCategoryParentId)
         // return 
         return addCourseSection({
-          "courseCategorLevel": ruleForm.courseCategoryLevel,
-          "courseCategorParentId": ruleForm.courseCategoryParentId,
+          "courseCategoryLevel": ruleForm.courseCategoryLevel,
+          "courseCategoryParentId": ruleForm.courseCategoryParentId,
           "courseCategoryDescription": ruleForm.courseCategoryDescription,
           "courseCategoryEname": ruleForm.courseCategoryEname,
-          "courseCategoryId": '',
           "courseCategoryName": ruleForm.courseCategoryName,
-          "courseCategoryOrder": '',
-          "courseCategoryThumbnailUrl": ruleForm.courseCategoryThumbnailUrl,
-          "id": '',
-          "idStr": ''
+          "courseCategoryThumbnailUrl": ruleForm.courseCategoryThumbnailUrl
         }).then(function(res){
           var status = false 
           if(res.code === 0) {
@@ -376,6 +372,7 @@
         var _self = this
 
         _self.onRuleForm(formName, function(){
+
           if(_self.isEditorStatus) {
             _self._putCourseSectionHandle(_self.ruleForm)
             .then(function(status){

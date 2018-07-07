@@ -63,3 +63,27 @@ export const putCourseSection = params => {
 export const deleteCourseSection = params => { 
   return axios.delete(`/course/category`, {data: params}).then(res => res.data)
 };
+
+
+
+//课件
+//添加章
+export const createCourseChapter = params => { 
+  return axios.post(`/course/chapter`, params).then(res => res.data)
+};
+
+//修改章
+export const putCourseChapter = params => { 
+  return axios.put(`/course/chapter`, params).then(res => res.data)
+};
+
+//删除章
+export const deleteCourseChapter = params => { 
+  return axios.delete(`/course/chapter`, {data: params}).then(res => res.data)
+};
+
+//章列表
+export const getCourseChapterList = params => { 
+  return axios.post(`/course/chapter/list`, params).then(res => res.data)
+};
+

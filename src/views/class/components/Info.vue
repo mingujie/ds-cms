@@ -78,7 +78,9 @@
 
 <script>
 import E from 'wangeditor'
-import { createCourseSubject } from '@/api/'
+import { createCourseSubject, 
+        getCourseSubjectDetail, 
+        putCourseSubject } from '@/api/'
 export default {
   data() {
     return {
@@ -131,12 +133,64 @@ export default {
     }
     editor.create()
   },
-  computed: {
-  },
+    watch: {
+        '$route'(to, from){
+          console.log('路由',to)
+          this.routeChangeHandle(to)
+        }
+    },
+    created(res){
+      var _self = this
+      _self.routeChangeHandle(_self.$router)
+
+    },
 
   methods: {
+    routeChangeHandle(router){
+      var _self = this
+      if(router.ename === 'editorCourse' && router.param.cid){
+        _self.isEditorStatus = true
+        _self.getCourseSubjectDetailHandle(router.param.cid)
+      }
+      _self.getCourseSubjectDetailHandle()
+    },
+    getCourseSubjectDetailHandle(courseSubjectId){
+      var _self = this
+      getCourseSubjectDetail({
+        courseSubjectId: courseSubjectId || ''
+      }).then(function(res){
+        if(res.code === 0) {
+          console.log('获取详情', res)
+        }
+      })
+    },
   createCourseSubjectHandle (ruleForm){
     createCourseSubject({
+      "cmsContentId": "",
+      "cmsContentText": ruleForm.cmsContentText,
+      "courseCategoryId": ruleForm.courseCategoryId || '',
+      "courseSubjectId": "",
+      "courseSubjectLevel": ruleForm.courseSubjectLevel,
+      "courseSubjectPrice": ruleForm.courseSubjectPrice || 0,
+      "courseSubjectSummary": ruleForm.courseSubjectSummary,
+      "courseSubjectTeacher": ruleForm.courseSubjectTeacher,
+      "courseSubjectThumbnailUrl": ruleForm.courseSubjectThumbnailUrl,
+      "courseSubjectTitle": ruleForm.courseSubjectTitle,
+      "id": "",
+      "idStr": "",
+      "tagCodes": [
+        "string"
+      ]
+    }).then(function(res){
+      console.log('课程创建', res)
+    })
+  },
+  putCourseSubjectHandle(){
+    var data = this.formartData(this.ruleForm)
+  },
+  formartData(ruleForm){
+    var _self = this, 
+    data = {
       "cmsContentId": 0,
       "cmsContentText": ruleForm.cmsContentText,
       "courseCategoryId": ruleForm.courseCategoryId,
@@ -151,10 +205,9 @@ export default {
       "idStr": "string",
       "tagCodes": [
         "string"
-      ]
-    }).then(function(res){
-      console.log('课程创建', res)
-    })
+      ]      
+    };
+    return data
   },
 	submitForm(formName) {
     var _self = this
