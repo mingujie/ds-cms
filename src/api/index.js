@@ -3,6 +3,7 @@ import axios from 'axios';
 // axios.create({
 //    headers: { 'Content-Type': 'application/json;charset=utf-8' }
 // });
+
 const base = '';
 
 let host = 'http://121.40.241.35:3000';
@@ -60,7 +61,7 @@ export const putCourseSection = params => {
 };
 
 //删除课程分类
-export const deleteCourseSection = params => { 
+export const deleteCourseCategory = params => { 
   return axios.delete(`/course/category`, {data: params}).then(res => res.data)
 };
 

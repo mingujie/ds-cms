@@ -2,10 +2,10 @@
     <div class="class-detail-info">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
             <el-form-item label="课程标题" prop="courseSubjectTitle">
-                <el-input v-model="ruleForm.courseSubjectTitle" class="w50"></el-input>
+              <el-input v-model="ruleForm.courseSubjectTitle" class="w50"></el-input>
             </el-form-item>
             <el-form-item label="课程简介" prop="courseSubjectSummary">
-                <el-input type="textarea" v-model="ruleForm.courseSubjectSummary" class="w50"></el-input>
+            <el-input type="textarea" v-model="ruleForm.courseSubjectSummary" class="w50"></el-input>
             </el-form-item>
             <el-form-item label="课程封面" prop="courseSubjectThumbnailUrl">
                 <span>图片大小为800*600，最大不超过5M，只支持JPG,PNG,GIF,JPEG格式</span>
@@ -20,18 +20,13 @@
                 </el-upload>
             </el-form-item>
             <el-form-item label="课程分类" prop="courseCategoryId">
-                <el-select v-model="ruleForm.courseCategoryId" placeholder="一级分类">
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
-                </el-select>
-                <el-select v-model="ruleForm.region" placeholder="二级分类">
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
-                </el-select>
-                <el-select v-model="ruleForm.region" placeholder="三级分类">
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
-                </el-select>
+                <el-cascader
+                  placeholder="试试搜索：指南"
+                  :options="initRuleForm.categoryOptions"
+                  v-model="initRuleForm.categoryValue"
+                  @change="onCategoryOptionsHandle"
+                  filterable
+                ></el-cascader>
             </el-form-item>
             <el-form-item label="课程讲师" prop="courseSubjectTeacher">
                 <el-input v-model="ruleForm.courseSubjectTeacher" class="w50"></el-input>
@@ -85,6 +80,7 @@ import { createCourseSubject,
 export default {
   data() {
     return {
+        categoryOptions: [],
 		    ruleForm: {
           "cmsContentId": "",
           "cmsContentText": "",
@@ -99,6 +95,8 @@ export default {
           "tagCodes": []
         },
         initRuleForm: {
+          categoryOptions: [],
+          categoryValue: [],
           priceType: '' //free or Pay
         },
         imageUrl: '',
@@ -126,33 +124,87 @@ export default {
   },
 
   mounted() {  
+
     var editor = new E(this.$refs.editor)
-    editor.customConfig.uploadImgServer = '/upload'  // 上传图片到服务器
+
+    editor.customConfig.uploadImgServer = '/upload'  // 
+
+    //上传图片到服务器
     editor.customConfig.onchange = (html) => {
         this.editorContent = html
     }
+
     editor.create()
   },
     watch: {
         '$route'(to, from){
-          console.log('路由',to)
+          console.log('路由', to)
           this.routeChangeHandle(to)
-        }
-    },
+        },
+        'initRuleForm.categoryValue': function(new1, old){
+            console.log(new1, '121')
+          },
+          deep: true    
+        },
     created(res){
       var _self = this
-      _self.initRuleFormHandle()
+      
       _self.routeChangeHandle(_self.$route)
 
     },
 
   methods: {
-    initRuleFormHandle(){
-      var ruleForm = this.ruleForm , 
+    initRuleFormHandle(data){
+      var _self = this,
+          ruleForm = this.ruleForm , 
           initRuleForm = this.initRuleForm;
       initRuleForm.priceType = this.getPriceTypeHandle(ruleForm, initRuleForm)
-
+      initRuleForm.categoryOptions = _self.formarCateGoryOptions(data.allCategories)
+      initRuleForm.categoryValue = _self.formartCategoryValue(data)
+      ruleForm.courseCategoryId = initRuleForm.categoryValue[2] || ''
     },
+    formartCategoryValue(data){
+      var arr = []
+      if(data.courseCategoryL1) {
+        arr[0] = data.courseCategoryL1.courseCategoryId
+      }else {
+        return arr;
+      }
+      if(data.courseCategoryL2) {
+        arr[1] = data.courseCategoryL2.courseCategoryId
+      }else {
+        return arr;
+      }
+      if(data.courseCategoryL3) {
+        arr[2] = data.courseCategoryL3.courseCategoryId
+      }else {
+        return arr;
+      }
+      return arr
+    },
+    /**
+     * formarCateGoryOptions 格式化分类选项（递归方式）
+     * @param  {[type]} options [description]
+     * @return { Array }        格式化后的数组，对应级联菜单数据
+     */
+    formarCateGoryOptions(options){
+      var _self = this, arr = []
+      function formartFn(ops, arr){
+        ops.forEach(function(obj, index, array){
+           arr.push({
+              value: obj.courseCategoryId,
+              label: obj.courseCategoryName
+           })
+           if(obj.children && obj.children.length) {
+            arr[index].children = []
+            formartFn(obj.children, arr[index].children)
+           }
+        })        
+      }
+      formartFn(options, arr)
+      return arr
+    },
+
     getPriceTypeHandle(ruleForm, initRuleForm){
       var value = 'free'
       if(ruleForm.courseSubjectPrice) {
@@ -176,9 +228,21 @@ export default {
         courseSubjectId: courseSubjectId || ''
       }).then(function(res){
         if(res.code === 0) {
+          _self.initForm(res.data)
+          _self.initRuleFormHandle(res.data)
+
           console.log('获取详情', res)
         }
       })
+    },
+    initForm( data ){
+      var _self = this, 
+          ruleForm = _self.ruleForm;
+      ruleForm.courseSubjectTitle = data.courseSubjectTitle
+      ruleForm.courseSubjectTeacher = data.courseSubjectTeacher
+      ruleForm.courseSubjectSummary = data.courseSubjectSummary
+      ruleForm.courseSubjectThumbnailUrl = data.courseSubjectThumbnailUrl
+      ruleForm.courseSubjectId = data.courseSubjectId
     },
   createCourseSubjectHandle (ruleForm){
     var _self = this
@@ -197,7 +261,7 @@ export default {
       "cmsContentId": "",
       "cmsContentText": ruleForm.cmsContentText,
       "courseCategoryId": ruleForm.courseCategoryId || "2",
-      "courseSubjectId": "",
+      "courseSubjectId": ruleForm.courseSubjectId,
       "courseSubjectLevel": ruleForm.courseSubjectLevel,
       "courseSubjectPrice": ruleForm.courseSubjectPrice || 0,
       "courseSubjectSummary": ruleForm.courseSubjectSummary,
@@ -208,6 +272,14 @@ export default {
     };
     return data
   },
+  onCategoryOptionsHandle(value){
+    var _self = this
+    if(value && value.length) {
+      _self.ruleForm.courseCategoryId = value[value.length-1]
+    }
+
+    console.log('我被改变了', _self.ruleForm.courseCategoryId)
+  },  
 	submitForm(formName) {
     var _self = this
       //console.log(_self.ruleForm)
