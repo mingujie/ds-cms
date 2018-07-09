@@ -111,6 +111,7 @@
     addCourseSection,
     deleteCourseCategory,
     putCourseSection } from '@/api/'
+    var id = 1000;
   export default {
 
     data() {
@@ -424,7 +425,6 @@
             return false;
           }
         });
-
       },
       confirm(options, callback) {
         this.$confirm('此操作将永久删除该分类及其子分类，你确定删除吗？', '警告', {

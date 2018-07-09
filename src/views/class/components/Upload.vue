@@ -1,21 +1,23 @@
 <template>
     <div class="class-upload-page">
         <el-row>
-            <el-button type="primary" @click="addSection()">添加章</el-button>
+            <el-button type="primary" @click="addSection('create')">添加章</el-button>
             <el-button type="primary" @click="addClass()">添加课件</el-button>
         </el-row>
 
         <div class="block">
             <el-tree
-            :data="data"
+            :data="courseChapterData"
             show-checkbox
             node-key="id"
             default-expand-all
             :expand-on-click-node="false">
             <span class="custom-tree-node" slot-scope="{ node, data }">
+
                 <span>{{ node.label }}</span>
                 <span>
-                <el-button type="text">添加课件</el-button>
+                <el-button type="text" v-if=
+                "data.type == 'chapter'" class="" @click="addClass(data)">添加课件</el-button>
                 <el-button type="text">编辑 </el-button>
                 <el-button type="text">删除</el-button>
                 </span>
@@ -25,13 +27,13 @@
 
         <!-- 添加章，编辑章 -->
         <el-dialog title="添加章" :visible.sync="dialog">
-            <el-form>
-                <el-form-item label="标题" :label-width="formLabelWidth">
-                    <el-input v-model="sectionName" auto-complete="off"></el-input>
+            <el-form :model="courseChapterForm" :rules="courseChapterRules" ref="courseChapterForm"> 
+                <el-form-item label="标题" :label-width="formLabelWidth" prop="title">
+                    <el-input v-model="courseChapterForm.title" auto-complete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="dialog = false">确 定</el-button>
+                <el-button type="primary" @click="onSubmit('courseChapterForm')">确 定</el-button>
                 <el-button @click="dialog = false">取 消</el-button>
             </div>
         </el-dialog>
@@ -65,7 +67,11 @@
 </template>
 
 <script>
-import {} from '@/api/'
+import {
+    createCourseChapter, 
+    putCourseChapter, 
+    deleteCourseChapter, 
+    getCourseChapterList} from '@/api/'
 export default {
   data() {
     return {
@@ -73,64 +79,144 @@ export default {
         dialog:false,
         dialogUpload: false,
         sectionName: '',
+        isEditorStatus: false,
         next:false,
         formLabelWidth: '120px',
-        data: [{
+        courseChapterForm: {
+            title: ''
+        },
+        courseChapterData: [{
             id: 1,
             label: '一级 1',
+            type: 'chapter',
             children: [{
-            id: 4,
-            label: '二级 1-1',
-            children: [{
-                id: 9,
-                label: '三级 1-1-1'
-            }, {
-                id: 10,
-                label: '三级 1-1-2'
-            }]
+                id: 4,
+                label: '二级 1-1',
+                type: 'node'
+            // children: [{
+            //     id: 9,
+            //     label: '三级 1-1-1'
+            // }, {
+            //     id: 10,
+            //     label: '三级 1-1-2'
+            // }]
             }]
         }, {
             id: 2,
             label: '一级 2',
+            type: 'chapter',
             children: [{
-            id: 5,
-            label: '二级 2-1'
+                id: 5,
+                label: '二级 2-1',
+                type: 'node'
             }, {
-            id: 6,
-            label: '二级 2-2'
+                id: 6,
+                label: '二级 2-2',
+                type: 'node'
             }]
         }, {
             id: 3,
             label: '一级 3',
+            type: 'chapter',
             children: [{
-            id: 7,
-            label: '二级 3-1'
+                id: 7,
+                label: '二级 3-1',
+                type: 'node'
             }, {
-            id: 8,
-            label: '二级 3-2'
+                id: 8,
+                label: '二级 3-2',
+                type: 'node'
             }]
-      }]
+      }],
+      courseChapterRules:{
+
+      }
     }
   },
-
+  props: {
+    cid: [String]
+  },
   mounted() {  
+    console.log('子组件', this.cid);
+    this.getCourseChapterListHandle(this.cid)
         let all = document.querySelectorAll('.el-tree-node__content')
         all[all.length - 1].style.borderBottom = '1px solid #ddd' 
   },
+
   computed: {
   },
   components: {
   },
   methods: {
-		submit() {
-			
-		},
-        addSection() {
-            this.dialog = true
-        },
-        addClass() {
-            this.dialogUpload = true
+    getCourseChapterListHandle(cid){
+        getCourseChapterList({
+            courseSubjectId: cid
+        }).then(function(res){
+            if(res.data === 0) {
+              
+            }
+        })
+    },
+    createCourseChapterHandle(cid, title){
+        createCourseChapter({
+            courseSubjectId: cid,
+            courseChapterTitle: title
+        }).then(function(res){
+            if(res.data === 0) {
+              
+            }
+        })
+    },
+	onSubmit(formName) {
+        var _self = this
+        console.log(this.courseChapterForm.title)
+        _self.onRuleForm(formName, function(){
+            if(_self.isEditorStatus) {
+
+            }else {
+                var data = _self.formartCourseChapter(_self.courseChapterForm.title)
+                _self.courseChapterData.push(data) 
+            }
+            _self.dialog = false
+        })
+        // this.createCourseChapterHandle(this.cid, this.courseChapterForm.title)
+	},
+    formartCourseChapter(value){
+        var index = this.courseChapterData.length + 1
+        var obj = {
+            label: value,
+            index: index
         }
+        return obj
+    },
+    addSection(value) {
+        this.dialog = true
+        if(value === 'create') {
+            this.isEditorStatus = false
+            // this.createCourseChapterHandle()
+        }
+    },
+    addClass(data) {
+        const newChild = { id: 111, label: 'testtest', children: [] };
+        if (!data.children) {
+          this.$set(data, 'children', []);
+        }
+        data.children.push(newChild);
+        //this.dialogUpload = true
+    },
+  onRuleForm(formName, callback){
+    var _self = this
+    _self.$refs[formName].validate((valid) => {
+      if (valid) {
+        //_self.submitLoading = true
+        callback()
+      } else {
+        console.log('error submit!!');
+        return false;
+      }
+    });
+  }
+
   }
 }
 </script>
@@ -146,6 +232,8 @@ export default {
                 padding-bottom: 10px;
                 border: 1px solid #ddd;
                 border-bottom: 0;
+                display: flex;
+                height: 45px;
             }
             .custom-tree-node {
                 flex: 1;
@@ -153,6 +241,9 @@ export default {
                 align-items: center;
                 justify-content: space-between;
                 padding-right: 10px;
+            }
+            .el-checkbox {
+                margin-top: 8px;
             }
         }
 
