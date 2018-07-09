@@ -107,10 +107,10 @@
 
 <script>
   import { 
-    getCourseSectionPage, 
-    addCourseSection,
+    getCourseCategoryPage, 
+    addCourseCategory,
     deleteCourseCategory,
-    putCourseSection } from '@/api/'
+    putCourseCategory } from '@/api/'
     var id = 1000;
   export default {
 
@@ -195,7 +195,7 @@
         _self.routerName = routerName
         _self.isShowRouter = isShowRouter
         _self.$set(_self.router, 'cid', cid)
-        _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize, cid)
+        _self._getCourseCategoryPage(_self.pagination.pageNum, _self.pagination.pageSize, cid)
       },
       formartRuleForm(){
         var ruleForm = this.ruleForm
@@ -217,9 +217,9 @@
         //alert('我会被关闭么')
         _self.$refs['ruleForm'].resetFields();
       },
-      _getCourseSectionPage(pageNum, pageSize, cid){
+      _getCourseCategoryPage(pageNum, pageSize, cid){
         var _self = this
-        getCourseSectionPage({
+        getCourseCategoryPage({
             pageNum: pageNum,
             pageSize: pageSize,
             parentId: cid
@@ -240,7 +240,7 @@
       },
       onChangePagination(pageNum){
         var _self = this
-        _self._getCourseSectionPage(pageNum, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
+        _self._getCourseCategoryPage(pageNum, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
       },
       onEditorHandle(index, row){
         var ruleForm = this.ruleForm
@@ -292,7 +292,7 @@
         .then(function(status){
             if(status){
               // rows.splice(index, 1);
-              _self._getCourseSectionPage(1, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
+              _self._getCourseCategoryPage(1, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
             }            
           })
         });
@@ -302,10 +302,10 @@
 
         _self.$router.push({name: _self.routerName, params: { cid: cid } })
       },
-      _putCourseSectionHandle(ruleForm){
+      _putCourseCategoryHandle(ruleForm){
         var _self = this
         
-        return putCourseSection({
+        return putCourseCategory({
           "courseCategoryLevel": ruleForm.courseCategoryLevel,
           "courseCategoryParentId": ruleForm.courseCategoryParentId,
           "courseCategoryDescription": ruleForm.courseCategoryDescription,
@@ -343,12 +343,12 @@
           return status
         })
       },
-      _addCourseSectionHandle(ruleForm){
+      _addCourseCategoryHandle(ruleForm){
         var _self = this 
 
         console.log('这将会是1个是',ruleForm.courseCategoryParentId)
         // return 
-        return addCourseSection({
+        return addCourseCategory({
           "courseCategoryLevel": ruleForm.courseCategoryLevel,
           "courseCategoryParentId": ruleForm.courseCategoryParentId,
           "courseCategoryDescription": ruleForm.courseCategoryDescription,
@@ -374,10 +374,10 @@
         _self.onRuleForm(formName, function(){
 
           if(_self.isEditorStatus) {
-            _self._putCourseSectionHandle(_self.ruleForm)
+            _self._putCourseCategoryHandle(_self.ruleForm)
             .then(function(status){
               if(status) {
-                _self._getCourseSectionPage(1, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
+                _self._getCourseCategoryPage(1, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
                 _self.submitLoading = false
                 _self.dialog.visible = false
 
@@ -386,12 +386,12 @@
             console.log('我在编辑呢')
 
           }else {
-            _self._addCourseSectionHandle(_self.ruleForm)
+            _self._addCourseCategoryHandle(_self.ruleForm)
             .then(function(status){
               if(status) {
                 _self.submitLoading = false
                 _self.dialog.visible = false
-                _self._getCourseSectionPage(_self.pagination.pageNum, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
+                _self._getCourseCategoryPage(_self.pagination.pageNum, _self.pagination.pageSize, _self.ruleForm.courseCategoryParentId)
               }
             })
           }

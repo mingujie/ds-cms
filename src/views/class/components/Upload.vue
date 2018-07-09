@@ -2,7 +2,7 @@
     <div class="class-upload-page">
         <el-row>
             <el-button type="primary" @click="addSection('create')">添加章</el-button>
-            <el-button type="primary" @click="addClass()">添加课件</el-button>
+<!--             <el-button type="primary" @click="addClass()">添加课件</el-button> -->
         </el-row>
 
         <div class="block">
@@ -13,13 +13,12 @@
             default-expand-all
             :expand-on-click-node="false">
             <span class="custom-tree-node" slot-scope="{ node, data }">
-
                 <span>{{ node.label }}</span>
                 <span>
                 <el-button type="text" v-if=
                 "data.type == 'chapter'" class="" @click="addClass(data)">添加课件</el-button>
-                <el-button type="text">编辑 </el-button>
-                <el-button type="text">删除</el-button>
+                <el-button type="text" @click="editorChapterHandle(node, data)">编辑 </el-button>
+                <el-button type="text" @click="deleteChapterHandle(node, data)">删除</el-button>
                 </span>
             </span>
             </el-tree>
@@ -67,11 +66,15 @@
 </template>
 
 <script>
+var newId = 1000;
 import {
     createCourseChapter, 
     putCourseChapter, 
     deleteCourseChapter, 
-    getCourseChapterList} from '@/api/'
+    getCourseChapterList,
+    createCourseSection,
+    putCourseSection,
+    deleteCourseSection} from '@/api/'
 export default {
   data() {
     return {
@@ -83,54 +86,11 @@ export default {
         next:false,
         formLabelWidth: '120px',
         courseChapterForm: {
-            title: ''
+            title: '',
+            courseChapterId: ''
         },
-        courseChapterData: [{
-            id: 1,
-            label: '一级 1',
-            type: 'chapter',
-            children: [{
-                id: 4,
-                label: '二级 1-1',
-                type: 'node'
-            // children: [{
-            //     id: 9,
-            //     label: '三级 1-1-1'
-            // }, {
-            //     id: 10,
-            //     label: '三级 1-1-2'
-            // }]
-            }]
-        }, {
-            id: 2,
-            label: '一级 2',
-            type: 'chapter',
-            children: [{
-                id: 5,
-                label: '二级 2-1',
-                type: 'node'
-            }, {
-                id: 6,
-                label: '二级 2-2',
-                type: 'node'
-            }]
-        }, {
-            id: 3,
-            label: '一级 3',
-            type: 'chapter',
-            children: [{
-                id: 7,
-                label: '二级 3-1',
-                type: 'node'
-            }, {
-                id: 8,
-                label: '二级 3-2',
-                type: 'node'
-            }]
-      }],
-      courseChapterRules:{
-
-      }
+        courseChapterData: [],
+        courseChapterRules:{}
     }
   },
   props: {
@@ -149,13 +109,28 @@ export default {
   },
   methods: {
     getCourseChapterListHandle(cid){
+        var _self = this
         getCourseChapterList({
             courseSubjectId: cid
         }).then(function(res){
-            if(res.data === 0) {
-              
+            console.log('获取章节列表', res)
+            if(res.code === 0) {
+              if(res.data && res.data.length) {
+                // console.log(res.data)
+                _self.courseChapterData = _self.formartCourseChapterList(res.data)
+                console.log(_self.courseChapterData)
+              }
             }
         })
+    },
+    formartCourseChapterList(data){
+        var _self = this
+        for(var i=0; i<data.length; i++) {
+            data[i].label = data[i].courseChapterTitle
+            data[i].type = 'chapter'
+        }
+
+        return data
     },
     createCourseChapterHandle(cid, title){
         createCourseChapter({
@@ -168,18 +143,20 @@ export default {
         })
     },
 	onSubmit(formName) {
-        var _self = this
-        console.log(this.courseChapterForm.title)
+        var _self = this, title = _self.courseChapterForm.title;
+        console.log(title)
         _self.onRuleForm(formName, function(){
             if(_self.isEditorStatus) {
-
+                _self.putCourseChapterHandle(_self.cid, _self.courseChapterForm.courseChapterId, title)
             }else {
-                var data = _self.formartCourseChapter(_self.courseChapterForm.title)
+                var data = _self.formartCourseChapter(title)
                 _self.courseChapterData.push(data) 
+                _self.createCourseChapterHandle(_self.cid, title)
             }
             _self.dialog = false
+            _self.isEditorStatus = false
         })
-        // this.createCourseChapterHandle(this.cid, this.courseChapterForm.title)
+        
 	},
     formartCourseChapter(value){
         var index = this.courseChapterData.length + 1
@@ -197,12 +174,66 @@ export default {
         }
     },
     addClass(data) {
-        const newChild = { id: 111, label: 'testtest', children: [] };
-        if (!data.children) {
-          this.$set(data, 'children', []);
+        var _self = this, 
+            courseChapterForm = _self.courseChapterForm;
+        // _self.createCourseSectionHandle(_self.cid, courseChapterForm.courseChapterId)
+        // const newChild = { id: newId++, label: 'testtest', children: [] };
+        // if (!data.children) {
+        //   this.$set(data, 'children', []);
+        // }
+
+        // data.children.push(newChild);
+        _self.dialogUpload = true
+    },
+    deleteChapterHandle(node, data){
+        deleteCourseChapter({
+            id: data.id
+        }).then(function(res){
+            if(res.code === 0) {
+
+            }
+        })
+    },
+    createCourseSectionHandle(cid, courseChapterId, sid){
+      createCourseSection({
+        "courseSectionId": sid || '',
+        "courseChapterId": courseChapterId,
+        "courseSubjectId": cid,
+        "courseSectionTitle": "课程介绍",
+        "courseSectionVideoFileid": "string",
+        "courseSectionVideoName": "string",
+        "courseSectionVideoUrl": "string",
+        "courseSectionVideoCoverName": "string",
+        "courseSectionVideoCoverUrl": "string",
+        "courseSectionVideoSeconds": 90
+      }).then(function(res){
+        if(res.code === 0){
+
         }
-        data.children.push(newChild);
-        //this.dialogUpload = true
+      })
+    },
+
+    editorChapterHandle(node, data){
+        var _self = this
+        _self.dialog = true
+        _self.isEditorStatus = true
+        _self.courseChapterForm.courseChapterId = data.courseChapterId
+            // this.createCourseChapterHandle()
+        // this.putCourseChapterHandle(_self.cid, data.courseChapterId, _self.courseChapterForm.title)
+        //console.log(row, data)
+    },
+    putCourseChapterHandle(cid, chapterId, chapterTitle){
+        var _self = this
+        putCourseChapter({
+            courseSubjectId: cid,
+            courseChapterId: chapterId,
+            courseChapterTitle: chapterTitle
+        }).then(function(res){
+            if(res.code === 0) {
+                console.log('修改章节标题成功')
+
+            }
+        })
     },
   onRuleForm(formName, callback){
     var _self = this
