@@ -13,21 +13,21 @@
       :data="tableData"
       style="width: 100%"
       v-loading="tableLoading"
-	  class="table-contain"	
+	  class="table-contain ds-table"	
 	  header-cell-class-name="cell-con">
       <!-- <el-table-column prop="date" label="ID"></el-table-column> -->
-      <el-table-column prop="courseSubjectTitle" label="标题"></el-table-column>
+      <el-table-column  prop="courseSubjectTitle" label="标题"></el-table-column>
 <!--       <el-table-column prop="date" label="分类"></el-table-column>
       <el-table-column prop="date" label="发布时间"></el-table-column> -->
-      <el-table-column prop="courseSubjectPrice" label="价格（元）"></el-table-column>
-      <el-table-column prop="courseSubjectLevel" label="等级"></el-table-column>
-      <el-table-column prop="courseSubjectTeacher" label="教师"></el-table-column>
+      <el-table-column width="100" prop="courseSubjectPrice" label="价格（元）"></el-table-column>
+      <el-table-column width="120" prop="courseSubjectLevel" label="等级"></el-table-column>
+      <el-table-column width="160" prop="courseSubjectTeacher" label="教师"></el-table-column>
 <!--       <el-table-column prop="name" label="总时长"></el-table-column>
       <el-table-column prop="name" label="学习人数"></el-table-column> -->
     	<el-table-column
 		fixed="right"
 		label="操作"
-		width="160">
+		width="180">
 		<template slot-scope="scope">
 			<el-button type="text" size="small" @click="toDetail(scope.row.courseSubjectId)">编辑</el-button>
 			<el-button type="text" size="small" @click="onDeleteRow(scope.$index, scope.row)">删除</el-button>
