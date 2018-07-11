@@ -2,10 +2,7 @@
     <div class="class-upload-page">
         <el-row>
             <el-button type="primary" @click="addSection('create')">添加章</el-button>
-            <div class="ds-block" style="padding-top: 10px; font-size: 12px; color:#999;">
-                注：请先添加课程的章，然后在添加课程的节（只有节才可以设置课件）。
-            </div>
-<!--             <el-button type="primary" @click="addClass()">添加课件</el-button> -->
+            <el-button type="primary" @click="addClass()">添加课件</el-button>
         </el-row>
 
         <div class="block">
@@ -28,14 +25,14 @@
         </div>
 
         <!-- 添加章，编辑章 -->
-        <el-dialog title="添加章" :visible.sync="dialog" @close="closedChapterForm('courseChapterForm')" width="50%">
-            <el-form class="ds-course-chapter-dialog" :model="courseChapterForm" :rules="courseChapterRules" ref="courseChapterForm"> 
+        <el-dialog title="添加章" :visible.sync="dialog">
+            <el-form :model="courseChapterForm" :rules="courseChapterRules" ref="courseChapterForm"> 
                 <el-form-item label="标题" :label-width="formLabelWidth" prop="title">
                     <el-input v-model="courseChapterForm.title" auto-complete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="chapterFormSubmit('courseChapterForm')">确 定</el-button>
+                <el-button type="primary" @click="onSubmit('courseChapterForm')">确 定</el-button>
                 <el-button @click="dialog = false">取 消</el-button>
             </div>
         </el-dialog>
@@ -44,19 +41,14 @@
         <el-dialog title="添加课件" :visible.sync="dialogUpload" width="700px">
             <div class="add-content">
                 <div class="head">
-                <el-steps align-center :active="stepActive" finish-status="success">
-                  <el-step title="选择课件类型"></el-step>
-                  <el-step title="设置课件内容"></el-step>
-                  <!-- <el-step title="步骤 3"></el-step> -->
-                </el-steps>
-<!--                     <div class="head-child">
+                    <div class="head-child">
                         <p>1</p>
                         <div>选择课件类型</div>
                     </div>
                     <div class="head-child">
                         <p>2</p>
                         <div>设置课件内容</div>
-                    </div> -->
+                    </div>
                 </div>
                 <div class="middle" v-if="!next">
                     <img src="../../../assets/movie.png" alt="">
@@ -102,13 +94,12 @@ export default {
   data() {
     return {
 		input:'',
-        stepActive: 0,
         dialog:false,
         dialogUpload: false,
         sectionName: '',
         isEditorStatus: false,
         next:false,
-        formLabelWidth: '80px',
+        formLabelWidth: '120px',
         courseChapterForm: {
             title: '',
             courseChapterId: ''
@@ -120,14 +111,8 @@ export default {
             minute: 22,
             second: 11
         },
-        currentCourseChapterRow: {},
         courseChapterData: [],
         courseChapterRules:{},
-        courseChapterRules: {
-            title: [{
-                required: true, message: '请输入课程章名', trigger: 'blur'
-            }]
-        },
         nodeFormRules: {}
     }
   },
@@ -139,7 +124,8 @@ export default {
     // let all = document.querySelectorAll('.el-tree-node__content');
     //     all[all.length - 1].style.borderBottom = '1px solid #ddd' 
     if(this.cid){
-        this.getCourseChapterListHandle(this.cid)
+    this.getCourseChapterListHandle(this.cid)
+
     }
   },
 
@@ -182,22 +168,19 @@ export default {
             }
         })
     },
-	chapterFormSubmit(formName) {
+	onSubmit(formName) {
         var _self = this, title = _self.courseChapterForm.title;
         console.log(title)
         _self.onRuleForm(formName, function(){
             if(_self.isEditorStatus) {
-                //_self.$set('currentCourseChapterRow', '')
-                _self.currentCourseChapterRow.label = title
-                //_self.putCourseChapterHandle(_self.cid, _self.courseChapterForm.courseChapterId, title)
+                _self.putCourseChapterHandle(_self.cid, _self.courseChapterForm.courseChapterId, title)
             }else {
                 var data = _self.formartCourseChapter(title)
                 _self.courseChapterData.push(data) 
-                //_self.createCourseChapterHandle(_self.cid, title)
+                _self.createCourseChapterHandle(_self.cid, title)
             }
             _self.dialog = false
             _self.isEditorStatus = false
-            console.log('提交时的数据', _self.courseChapterData)
         })
         
 	},
@@ -205,9 +188,7 @@ export default {
         var index = this.courseChapterData.length + 1
         var obj = {
             label: value,
-            index: index,
-            id: index,
-            type: 'chapter'
+            index: index
         }
         return obj
     },
@@ -231,17 +212,13 @@ export default {
         _self.dialogUpload = true
     },
     deleteChapterHandle(node, data){
-        const parent = node.parent;
-        const children = parent.data.children || parent.data;
-        const index = children.findIndex(d => d.id === data.id);
-        children.splice(index, 1);
-        // deleteCourseChapter({
-        //     id: data.id
-        // }).then(function(res){
-        //     if(res.code === 0) {
+        deleteCourseChapter({
+            id: data.id
+        }).then(function(res){
+            if(res.code === 0) {
 
-        //     }
-        // })
+            }
+        })
     },
     createCourseSectionHandle(cid, courseChapterId, sid){
       createCourseSection({
@@ -266,10 +243,7 @@ export default {
         var _self = this
         _self.dialog = true
         _self.isEditorStatus = true
-        console.log('编辑时的数据',data)
-        _self.courseChapterForm.title = data.label
-        _self.currentCourseChapterRow = data
-        // _self.courseChapterForm.courseChapterId = data.courseChapterId
+        _self.courseChapterForm.courseChapterId = data.courseChapterId
             // this.createCourseChapterHandle()
         // this.putCourseChapterHandle(_self.cid, data.courseChapterId, _self.courseChapterForm.title)
         //console.log(row, data)
@@ -287,22 +261,18 @@ export default {
             }
         })
     },
-      onRuleForm(formName, callback){
-        var _self = this
-        _self.$refs[formName].validate((valid) => {
-          if (valid) {
-            //_self.submitLoading = true
-            callback()
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
-      },
-      closedChapterForm(formName){
-        console.log('关闭的回调')
-        this.$refs[formName].resetFields();
+  onRuleForm(formName, callback){
+    var _self = this
+    _self.$refs[formName].validate((valid) => {
+      if (valid) {
+        //_self.submitLoading = true
+        callback()
+      } else {
+        console.log('error submit!!');
+        return false;
       }
+    });
+  }
 
   }
 }
@@ -311,9 +281,6 @@ export default {
 <style lang="scss">
     .class-upload-page{
         text-align: left;
-        .el-steps {
-            width: 100%;
-        }
         .block{
             padding-top: 20px;
             font-size: 18px;
@@ -336,14 +303,11 @@ export default {
                 margin-top: 8px;
             }
         }
-        .ds-course-chapter-dialog {
-            padding-right: 50px;
-        }
+
         .add-content{
             .head{
                 display: flex;
                 align-items: center;
-                padding-bottom: 50px;
                 .head-child{
                     display: flex;
                     align-items: center;
@@ -383,7 +347,7 @@ export default {
                 }
             }
             .middle-form{
-                padding-right: 50px;
+
             }
         }
     }

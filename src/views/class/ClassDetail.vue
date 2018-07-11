@@ -1,12 +1,12 @@
 <template>
     <div class="class-detail-page">
-        <el-tabs type="border-card">
+        <el-tabs type="border-card" class="ds-tabs">
             <el-tab-pane label="课程信息">
                 <class-info></class-info>
             </el-tab-pane>
-            <el-tab-pane label="课件信息">
-                <class-upload v-if="cid" :cid="cid"></class-upload>
-            </el-tab-pane>
+<!--             <el-tab-pane label="课件信息">
+                <class-upload :cid="cid"></class-upload>
+            </el-tab-pane> -->
         </el-tabs>
     </div>
 </template>

@@ -13,7 +13,8 @@ import UserList from '@/views/user/List'
 import ClassList from '@/views/class/ClassList'
 import ClassDetail from '@/views/class/ClassDetail'
 import ClassManager from '@/views/class/ClassManager'
-
+//课件
+import CourseChapter from '@/views/class/components/CourseChapter'
 //课程路由
 import CurriculumCreate from '@/views/curriculum/Create'
 import CurriculumList from '@/views/curriculum/List'
@@ -53,19 +54,21 @@ export default new Router({
         name: '新建课程',
         component: ClassDetail
       }, {
+          path: '/class/node/:cid',
+          name: '创建课件',
+          ename: 'createNode',
+          component: CourseChapter, 
+          hidden: true          
+      },{
+          path: '/class/editor/:cid',
+          name: '编辑课程',
+          ename: 'editorCourse',
+          hidden: true,
+          component: ClassDetail
+      }, {
         path: '/class/list',
         name: '课程列表',
         component: ClassList
-      },{
-        path: '/class/detail',
-        name: '课程详情',
-        component: ClassDetail,
-        children:[{
-          path: '/class/detail/:cid',
-          name: '编辑课程',
-          ename: 'editorCourse',
-          component: ClassDetail,          
-        }]
       },{
         path: '/class/manager',
         name: '课程审核',

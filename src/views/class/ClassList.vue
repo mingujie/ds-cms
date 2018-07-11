@@ -27,11 +27,11 @@
     	<el-table-column
 		fixed="right"
 		label="操作"
-		width="100">
+		width="160">
 		<template slot-scope="scope">
 			<el-button type="text" size="small" @click="toDetail(scope.row.courseSubjectId)">编辑</el-button>
 			<el-button type="text" size="small" @click="onDeleteRow(scope.$index, scope.row)">删除</el-button>
-			<el-button type="text" size="small">增加课件</el-button>
+			<el-button type="text" size="small" @click="routerCourseChapter(scope.row.courseSubjectId)">增（修）课件</el-button>
 		</template>
 	  </el-table-column>
     </el-table>
@@ -136,6 +136,9 @@ export default {
             }            
           })
         });
+      },
+      routerCourseChapter(cid){
+		this.$router.push({name: '创建课件', params: { cid: cid } })
       },
       confirm(options, callback) {
         this.$confirm('此操作将永久删除该分类及其子分类，你确定删除吗？', '警告', {

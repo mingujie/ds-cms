@@ -51,7 +51,7 @@
             <el-form-item label="标签" prop="tagCodes">
                 <el-select v-model="ruleForm.tagCodes" multiple placeholder="请选择">
                     <el-option
-                    v-for="item in options"
+                    v-for="item in initRuleForm.tagsOptions"
                     :key="item.value"
                     :label="item.label"
                     :value="item.value">
@@ -60,7 +60,7 @@
             </el-form-item>
 
             <el-form-item label="课程详情" prop="cmsContentText">
-                <div ref="editor" style="text-align:left;position: relative;z-index: 1;" ></div>
+                <div ref="editor" id="editorEle" style="text-align:left;position: relative;z-index: 1;" ></div>
                 <!-- <button @click="getContent">查看内容</button> -->
             </el-form-item>
             
@@ -97,45 +97,37 @@ export default {
         initRuleForm: {
           categoryOptions: [],
           categoryValue: [],
-          priceType: '' //free or Pay
+          priceType: '', //free or Pay
+          tagsOptions: [{
+            value: '选项1',
+            label: '黄金糕'
+          }, {
+            value: '选项2',
+            label: '双皮奶'
+          }, {
+            value: '选项3',
+            label: '蚵仔煎'
+          }, {
+            value: '选项4',
+            label: '龙须面'
+          }, {
+            value: '选项5',
+            label: '北京烤鸭'
+          }],
         },
         imageUrl: '',
         rules: {
 
         },
-        options: [{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }, {
-          value: '选项3',
-          label: '蚵仔煎'
-        }, {
-          value: '选项4',
-          label: '龙须面'
-        }, {
-          value: '选项5',
-          label: '北京烤鸭'
-        }],
         value5: [],
     }
   },
 
   mounted() {  
 
-    var editor = new E(this.$refs.editor)
-
-    editor.customConfig.uploadImgServer = '/upload'  // 
-
-    //上传图片到服务器
-    editor.customConfig.onchange = (html) => {
-        this.editorContent = html
-    }
-
-    editor.create()
+    this.initEditor()
   },
+
     watch: {
         '$route'(to, from){
           console.log('路由', to)
@@ -154,6 +146,21 @@ export default {
     },
 
   methods: {
+    initEditor(){
+      var editor = new E(this.$refs.editor), _self = this;
+      editor.customConfig.uploadImgServer = '/upload'  // 
+      //上传图片到服务器
+      editor.customConfig.onchange = (html) => {
+          _self.editorContent = html
+      }
+      editor.create()
+      editor.txt.html('<p>用 JS 设置的内容</p>')
+      document.getElementById('editorEle').addEventListener('mouseout', function () {
+          // 读取 html
+          var html = editor.txt.html()
+          _self.ruleForm.cmsContentText = html
+      }, false)
+    },
     initRuleFormHandle(data){
       var _self = this,
           ruleForm = this.ruleForm , 
@@ -246,11 +253,13 @@ export default {
     },
   createCourseSubjectHandle (ruleForm){
     var _self = this
-    createCourseSubject(_self.formartData(ruleForm))
-    .then(function(res){
+    console.log(_self.ruleForm.tagCodes)
+    console.log('课程提交信息',_self.formartData(ruleForm));
+    // createCourseSubject(_self.formartData(ruleForm))
+    // .then(function(res){
       
-      console.log('课程创建', res)
-    })
+    //   console.log('课程创建', res)
+    // })
   },
   putCourseSubjectHandle(){
     var data = this.formartData(this.ruleForm)

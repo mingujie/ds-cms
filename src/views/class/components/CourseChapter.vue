@@ -1,5 +1,8 @@
 <template>
-    <div class="class-upload-page">
+    <div class="ds-course-chapter">
+      <el-tabs type="border-card" class="ds-tabs">
+
+      <el-tab-pane label="课件信息">
         <el-row>
             <el-button type="primary" @click="addSection('create')">添加章</el-button>
             <div class="ds-block" style="padding-top: 10px; font-size: 12px; color:#999;">
@@ -85,6 +88,9 @@
                 <el-button type="primary" v-if="next" @click="next = false">上一步</el-button>
                 <el-button type="primary" v-if="next">保存</el-button>            </div>
         </el-dialog>
+        </el-tab-pane>
+      </el-tabs>
+
     </div>
 </template>
 
@@ -97,11 +103,14 @@ import {
     getCourseChapterList,
     createCourseSection,
     putCourseSection,
-    deleteCourseSection} from '@/api/'
+    deleteCourseSection, 
+    getCourseSectionList  } from '@/api/'
 export default {
+  components: {
+  },
   data() {
     return {
-		input:'',
+    input:'',
         stepActive: 0,
         dialog:false,
         dialogUpload: false,
@@ -131,22 +140,30 @@ export default {
         nodeFormRules: {}
     }
   },
-  props: {
-    cid: [String]
-  },
+  // props: {
+  //   cid: [String]
+  // },
   mounted() {  
-    console.log('子组件', this.cid);
+
     // let all = document.querySelectorAll('.el-tree-node__content');
     //     all[all.length - 1].style.borderBottom = '1px solid #ddd' 
-    if(this.cid){
-        this.getCourseChapterListHandle(this.cid)
-    }
+    // if(this.cid){
+    //     this.getCourseChapterListHandle(this.cid)
+    // }
   },
 
   computed: {
   },
-  components: {
+  created(){
+    var route = this.$route
+    console.log(route)
+    this.cid = route.params.cid
+    if(this.cid){
+        this.getCourseChapterListHandle(this.cid)
+    }
+    console.log('子组件', this.cid);
   },
+
   methods: {
     getCourseChapterListHandle(cid){
         var _self = this
@@ -158,10 +175,18 @@ export default {
               if(res.data && res.data.length) {
                 // console.log(res.data)
                 _self.courseChapterData = _self.formartCourseChapterList(res.data)
+                _self.getCourseSectionListHandle("11")
                 console.log(_self.courseChapterData)
               }
             }
         })
+    },
+    getCourseSectionListHandle(chapterId){
+      getCourseSectionList({
+        courseChapterId: chapterId
+      }).then(function(res){
+        console.log('获取节信息', res)
+      })
     },
     formartCourseChapterList(data){
         var _self = this
@@ -182,25 +207,25 @@ export default {
             }
         })
     },
-	chapterFormSubmit(formName) {
+  chapterFormSubmit(formName) {
         var _self = this, title = _self.courseChapterForm.title;
         console.log(title)
         _self.onRuleForm(formName, function(){
             if(_self.isEditorStatus) {
                 //_self.$set('currentCourseChapterRow', '')
                 _self.currentCourseChapterRow.label = title
-                //_self.putCourseChapterHandle(_self.cid, _self.courseChapterForm.courseChapterId, title)
+                _self.putCourseChapterHandle(_self.cid, _self.courseChapterForm.courseChapterId, title)
             }else {
                 var data = _self.formartCourseChapter(title)
                 _self.courseChapterData.push(data) 
-                //_self.createCourseChapterHandle(_self.cid, title)
+                _self.createCourseChapterHandle(_self.cid, title)
             }
             _self.dialog = false
             _self.isEditorStatus = false
             console.log('提交时的数据', _self.courseChapterData)
         })
         
-	},
+  },
     formartCourseChapter(value){
         var index = this.courseChapterData.length + 1
         var obj = {
@@ -219,29 +244,40 @@ export default {
         }
     },
     addClass(data) {
-        var _self = this, 
+        const _self = this, 
             courseChapterForm = _self.courseChapterForm;
-        // _self.createCourseSectionHandle(_self.cid, courseChapterForm.courseChapterId)
-        // const newChild = { id: newId++, label: 'testtest', children: [] };
-        // if (!data.children) {
-        //   this.$set(data, 'children', []);
-        // }
-
-        // data.children.push(newChild);
-        _self.dialogUpload = true
+        _self.createCourseSectionHandle(_self.cid, courseChapterForm.courseChapterId)
+        const newChild = { id: newId++, label: 'testtest', children: [] };
+        if (!data.children) {
+          this.$set(data, 'children', []);
+        }
+        data.children.push(newChild);
+        //_self.dialogUpload = true
     },
     deleteChapterHandle(node, data){
+        const _self = this
         const parent = node.parent;
         const children = parent.data.children || parent.data;
         const index = children.findIndex(d => d.id === data.id);
-        children.splice(index, 1);
-        // deleteCourseChapter({
-        //     id: data.id
-        // }).then(function(res){
-        //     if(res.code === 0) {
+        _self.confirm({}, function(){
+            deleteCourseChapter({
+              id: data.id
+            }).then(function(res){
+              if(res.code === 0){
+                children.splice(index, 1);
+                _self.$message({
+                  type: 'success',
+                  message: '删除成功!'
+                });
+              }else {
+                _self.$message({
+                  type: 'success',
+                  message: res.message
+                });
+              }
+            })          
+        })
 
-        //     }
-        // })
     },
     createCourseSectionHandle(cid, courseChapterId, sid){
       createCourseSection({
@@ -257,7 +293,7 @@ export default {
         "courseSectionVideoSeconds": 90
       }).then(function(res){
         if(res.code === 0){
-
+          console.log('创建课件')
         }
       })
     },
@@ -268,9 +304,9 @@ export default {
         _self.isEditorStatus = true
         console.log('编辑时的数据',data)
         _self.courseChapterForm.title = data.label
+        
+        _self.courseChapterForm.courseChapterId = data.courseChapterId
         _self.currentCourseChapterRow = data
-        // _self.courseChapterForm.courseChapterId = data.courseChapterId
-            // this.createCourseChapterHandle()
         // this.putCourseChapterHandle(_self.cid, data.courseChapterId, _self.courseChapterForm.title)
         //console.log(row, data)
     },
@@ -302,14 +338,29 @@ export default {
       closedChapterForm(formName){
         console.log('关闭的回调')
         this.$refs[formName].resetFields();
+      },
+      confirm(options, callback) {
+        this.$confirm('此操作将永久删除该信息，你确定删除吗？', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          callback()
+        }).catch(() => {
+          // this.$message({
+          //   type: 'info',
+          //   message: '已取消删除'
+          // });          
+        });
       }
+
 
   }
 }
 </script>
 
 <style lang="scss">
-    .class-upload-page{
+    .ds-course-chapter{
         text-align: left;
         .el-steps {
             width: 100%;
