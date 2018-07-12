@@ -60,7 +60,8 @@
             </el-form-item>
 
             <el-form-item label="课程详情" prop="cmsContentText">
-                <div ref="editor" id="editorEle" style="text-align:left;position: relative;z-index: 1;" ></div>
+              <wang-editor  v-model="ruleForm.cmsContentText"></wang-editor>
+                <!-- <div ref="editor" id="editorEle" style="text-align:left;position: relative;z-index: 1;" ></div> -->
                 <!-- <button @click="getContent">查看内容</button> -->
             </el-form-item>
             
@@ -73,11 +74,13 @@
 </template>
 
 <script>
-import E from 'wangeditor'
+// import E from 'wangeditor'
+import WangEditor from './WangEditor'
 import { createCourseSubject, 
         getCourseSubjectDetail, 
         putCourseSubject } from '@/api/'
 export default {
+  components: {WangEditor},
   data() {
     return {
         categoryOptions: [],
@@ -125,7 +128,6 @@ export default {
 
   mounted() {  
 
-    this.initEditor()
   },
 
     watch: {
@@ -146,22 +148,7 @@ export default {
     },
 
   methods: {
-    initEditor(){
-      var editor = new E(this.$refs.editor), _self = this;
 
-      editor.customConfig.uploadImgServer = '/upload'  // 
-      //上传图片到服务器
-      editor.customConfig.onchange = (html) => {
-          _self.editorContent = html
-      }
-      editor.create()
-      _self.editor = editor
-      // document.getElementById('editorEle').addEventListener('mouseout', function () {
-      //     // 读取 html
-      //     var html = editor.txt.html()
-      //     _self.ruleForm.cmsContentText = html
-      // }, false)
-    },
     initRuleFormHandle(data){
       var _self = this,
           ruleForm = this.ruleForm , 
@@ -253,16 +240,16 @@ export default {
       ruleForm.cmsContentText = data.content.cmsContentText
       ruleForm.cmsContentId = data.content.cmsContentId
       ruleForm.courseSubjectId = data.courseSubjectId
-      _self.editor.txt.html(_self.ruleForm.cmsContentText)
+      //_self.editor.txt.html(_self.ruleForm.cmsContentText)
     },
   createCourseSubjectHandle (ruleForm){
     var _self = this
     console.log(_self.ruleForm.tagCodes)
     console.log('课程提交信息',_self.formartData(ruleForm));
-    createCourseSubject(_self.formartData(ruleForm))
-    .then(function(res){
-      console.log('课程创建', res)
-    })
+    // createCourseSubject(_self.formartData(ruleForm))
+    // .then(function(res){
+    //   console.log('课程创建', res)
+    // })
   },
   putCourseSubjectHandle(){
     var data = this.formartData(this.ruleForm)
@@ -330,10 +317,7 @@ export default {
           this.$message.error('上传头像图片大小不能超过 2MB!');
         }
         return isJPG && isLt2M;
-      },
-    getContent: function () {
-        alert(this.editorContent)
-    }  
+      }
   }
 }
 </script>
