@@ -21,7 +21,7 @@
       <el-table-column prop="date" label="发布时间"></el-table-column> -->
       <el-table-column width="100" prop="courseSubjectPrice" label="价格（元）"></el-table-column>
       <el-table-column width="120" prop="courseSubjectLevel" label="等级"></el-table-column>
-      <el-table-column width="160" prop="courseSubjectTeacher" label="教师"></el-table-column>
+      <el-table-column width="160" prop="courseSubjectTeacher" label="讲师"></el-table-column>
 <!--       <el-table-column prop="name" label="总时长"></el-table-column>
       <el-table-column prop="name" label="学习人数"></el-table-column> -->
     	<el-table-column

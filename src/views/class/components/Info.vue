@@ -31,6 +31,7 @@
             <el-form-item label="课程讲师" prop="courseSubjectTeacher">
                 <el-input v-model="ruleForm.courseSubjectTeacher" class="w50"></el-input>
             </el-form-item>
+
             <el-form-item label="课程等级" prop="courseSubjectLevel">
                 <el-select v-model="ruleForm.courseSubjectLevel" placeholder="选择等级">
                     <el-option label="初级" :value="1"></el-option>
@@ -225,8 +226,6 @@ export default {
         if(res.code === 0) {
           _self.initForm(res.data)
           _self.initRuleFormHandle(res.data)
-
-          console.log('获取详情', res)
         }
       })
     },
@@ -237,19 +236,23 @@ export default {
       ruleForm.courseSubjectTeacher = data.courseSubjectTeacher
       ruleForm.courseSubjectSummary = data.courseSubjectSummary
       ruleForm.courseSubjectThumbnailUrl = data.courseSubjectThumbnailUrl
-      ruleForm.cmsContentText = data.content.cmsContentText
+      ruleForm.courseSubjectLevel = data.courseSubjectLevel
+      ruleForm.tagCodes = data.tags
+      _self.$set(_self.ruleForm, 'cmsContentText',data.content.cmsContentText)
+
+      //ruleForm.cmsContentText = data.content.cmsContentText
+      //alert(ruleForm.cmsContentText)
       ruleForm.cmsContentId = data.content.cmsContentId
       ruleForm.courseSubjectId = data.courseSubjectId
-      //_self.editor.txt.html(_self.ruleForm.cmsContentText)
     },
   createCourseSubjectHandle (ruleForm){
     var _self = this
     console.log(_self.ruleForm.tagCodes)
     console.log('课程提交信息',_self.formartData(ruleForm));
-    // createCourseSubject(_self.formartData(ruleForm))
-    // .then(function(res){
-    //   console.log('课程创建', res)
-    // })
+    createCourseSubject(_self.formartData(ruleForm))
+    .then(function(res){
+      console.log('课程创建', res)
+    })
   },
   putCourseSubjectHandle(){
     var data = this.formartData(this.ruleForm)

@@ -19,8 +19,13 @@ export default {
     value: [String],
     cid: [String]
   },
+  watch:{
+    value(val){
+      this.setEditorContent(val)
+    }
+  },
   mounted() {  
-    console.log(this.value, 'fff')
+    console.log(this.value)
     this.initEditor()
   },
 
@@ -31,7 +36,7 @@ export default {
   methods: {
     initEditor(){
       var _self = this
-      var editor = new Editor(_self.$refs.editor);
+      var editor  = new Editor(_self.$refs.editor);
 
       editor.customConfig.uploadImgServer = '/upload'  // 
       //上传图片到服务器
@@ -40,8 +45,12 @@ export default {
           _self.$emit('input', html)
       }
       editor.create()     
-      editor.txt.html(_self.value)
       
+      _self.editor = editor
+    },
+    setEditorContent(val){
+      var _self = this
+      _self.editor.txt.html(val)
     }
   }
 }
