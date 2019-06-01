@@ -90,7 +90,7 @@
             </el-upload>
           </el-form-item>
           <el-form-item label="个人简介" prop="copyright">
-            <el-input type="textarea" :rows="3" placeholder="请输入个人简介" v-model="ruleForm.copyright"></el-input>
+            <el-input type="textarea" :rows="3" placeholder="请输入个人简介 " v-model="ruleForm.copyright"></el-input>
           </el-form-item>
         </el-form>      
         <span slot="footer" class="dialog-footer">
